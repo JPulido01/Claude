@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Cultivos — Stardew Valley</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🌾 CALCULADORA DE CULTIVOS 🌾<br>STARDEW VALLEY</h1>
+  <p>Análisis completo · Crudo vs Procesado</p>
+</header>
+
+<div class="grid">
+  <div class="section">
+    <div class="section-header"><h2>🌱 SELECCIONAR CULTIVO</h2></div>
+    <div class="section-body">
+      <div class="field">
+        <label>Cultivo</label>
+        <select id="crop" onchange="loadCropData()" style="min-width:180px;"></select>
+      </div>
+      <div id="crop_summary" class="crop-summary" style="margin-top:8px;margin-bottom:0;"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><h2>📊 PARÁMETROS</h2></div>
+    <div class="section-body">
+      <div class="field">
+        <label>Cantidad de plantas</label>
+        <input type="number" id="plants" value="100" min="1">
+      </div>
+      <div class="field">
+        <label>Espacio disponible (tiles)</label>
+        <input type="number" id="tiles" value="100" min="1">
+      </div>
+      <div class="field">
+        <label>Días de temporada</label>
+        <input type="number" id="season_days" value="28" min="1">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header"><h2>📝 DATOS DEL CULTIVO (editables)</h2></div>
+  <div class="section-body">
+    <div class="field">
+      <label>Costo semilla (g)</label>
+      <input type="number" id="seed_cost" value="0" min="0">
+    </div>
+    <div class="field">
+      <label>Precio venta base (g)</label>
+      <input type="number" id="sell_price" value="0" min="0">
+    </div>
+    <div class="field">
+      <label>Días de crecimiento</label>
+      <input type="number" id="grow_days" value="0" min="1">
+    </div>
+    <div class="field">
+      <label>Días de rebrote (0=no rebrota)</label>
+      <input type="number" id="regrow_days" value="0" min="0">
+    </div>
+    <div class="field">
+      <label>Unidades por cosecha</label>
+      <input type="number" id="multi" value="1" min="1">
+    </div>
+    <div id="crop_note" style="font-size:13px;color:var(--text-dim);margin-top:6px;display:none;padding:4px 0;"></div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="section">
+    <div class="section-header"><h2>⭐ PROFESIONES</h2></div>
+    <div class="section-body">
+      <div class="toggle-field">
+        <label for="tiller">Tiller (+10% venta cruda)</label>
+        <label class="toggle"><input type="checkbox" id="tiller"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-field">
+        <label for="artisan">Artisan (+40% procesado)</label>
+        <label class="toggle"><input type="checkbox" id="artisan"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-field">
+        <label for="agriculturist">Agriculturist (-10% crecimiento)</label>
+        <label class="toggle"><input type="checkbox" id="agriculturist"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="field" style="margin-top:8px;">
+        <label>Nivel de Agricultura (0-14)</label>
+        <input type="number" id="farming_level" value="0" min="0" max="14">
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><h2>🌿 FERTILIZANTE</h2></div>
+    <div class="section-body">
+      <div class="field">
+        <label>Acelerador (velocidad)</label>
+        <select id="fertilizer" onchange="updateFertCost()">
+          <option value="0" data-cost="0">Ninguno</option>
+          <option value="0.1" data-cost="2">Acelerador Básico (+10%)</option>
+          <option value="0.25" data-cost="4">Acelerador Calidad (+25%)</option>
+          <option value="0.33" data-cost="10">Acelerador Deluxe (+33%)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Fertilizante calidad</label>
+        <select id="quality_fert" onchange="updateFertCost()">
+          <option value="none" data-cost="0">Ninguno</option>
+          <option value="basic" data-cost="2">Básico</option>
+          <option value="deluxe" data-cost="5">Deluxe</option>
+          <option value="luxury" data-cost="10">Lujo (Fertilizante Ultra)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Costo fertilizante/tile (g)</label>
+        <input type="number" id="fert_cost" value="0" min="0">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header"><h2>🍷 PROCESAMIENTO</h2></div>
+  <div class="section-body">
+    <div class="field">
+      <label>Máquina / Producto</label>
+      <select id="process_type" onchange="updateProcessNote()">
+        <optgroup label="── TONEL (Keg) ──">
+          <option value="keg_wine">Vino (fruta) — ×3, 7 días</option>
+          <option value="keg_juice">Jugo (vegetal) — ×2.25, 4 días</option>
+          <option value="keg_mead">Hidromiel (miel) — 300g fijo, 10h</option>
+          <option value="keg_pale_ale">Cerveza Pálida (lúpulo) — 300g fijo, ~1.5 días</option>
+          <option value="keg_beer">Cerveza (trigo) — 200g fijo, 1 día</option>
+        </optgroup>
+        <optgroup label="── BARRIL (Cask) ──">
+          <option value="cask_wine">Barril Vino/Mermelada — ×3 fruta, 7 días</option>
+          <option value="cask_juice">Barril Zumo/Encurtido — ×2.25 vegetal, 4 días</option>
+        </optgroup>
+        <optgroup label="── ENVASADORA (Preserves Jar) ──">
+          <option value="jar_jam">Mermelada (fruta) — ×2+50g, 2-3 días</option>
+          <option value="jar_pickle">Encurtido (vegetal) — ×2+50g, 2-3 días</option>
+        </optgroup>
+        <optgroup label="── OTRAS ──">
+          <option value="dryer_fruit">Deshidratador Fruta — ×7.5+25g, 1 día (5 uds)</option>
+          <option value="dryer_mushroom">Deshidratador Setas — ×7.5+25g, 1 día (5 uds)</option>
+          <option value="smoker">Ahumador Pescado — ×2, 50 min</option>
+          <option value="loom">Telar (lana→tela) — 470g fijo, 4h</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="field">
+      <label>Kegs/máquinas disponibles</label>
+      <input type="number" id="kegs" value="50" min="0">
+    </div>
+    <div id="process_note" style="font-size:13px;color:var(--text-dim);margin-top:6px;padding:6px;border:1px solid var(--border);background:var(--input-bg);"></div>
+  </div>
+</div>
+
+<div class="optional-divider">MÓDULOS OPCIONALES</div>
+
+<button class="btn" onclick="toggleAnimals()" id="btn_animals" style="margin-bottom:8px;">▶ + AGREGAR ANIMALES (OPCIONAL) ◀</button>
+
+<div class="section" id="animals_section" style="display:none;">
+  <div class="section-header"><h2>🐄 ANIMALES</h2></div>
+  <div class="section-body">
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px;">
+      Precio venta = Precio base × (Amistad/1000 + 0.3). Máx. amistad (5♥) = ×1.3
+    </div>
+    <div id="animal_rows"></div>
+    <button class="btn" onclick="addAnimalRow()" style="font-size:8px;padding:8px;margin-top:8px;">+ AÑADIR ANIMAL</button>
+  </div>
+</div>
+
+<button class="btn" onclick="toggleSection('greenhouse_section','btn_greenhouse')" id="btn_greenhouse" style="margin-bottom:8px;">▶ + INVERNADERO (OPCIONAL) ◀</button>
+
+<div class="section" id="greenhouse_section" style="display:none;">
+  <div class="section-header"><h2>🏡 INVERNADERO</h2></div>
+  <div class="section-body">
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px;">
+      En invernadero los cultivos crecen todo el año sin límite de temporada. Los de rebrote producen indefinidamente.
+    </div>
+    <div class="toggle-field">
+      <label for="greenhouse_mode">Activar modo invernadero (temporada = año completo: 112 días)</label>
+      <label class="toggle"><input type="checkbox" id="greenhouse_mode" onchange="toggleGreenhouseMode()"><span class="toggle-slider"></span></label>
+    </div>
+    <div id="gh_info" style="font-size:13px;color:var(--text-dim);margin-top:6px;display:none;">
+      ✓ Los días de temporada se fijan en 112 (4 temporadas). Espacio útil: 120 tiles (10×12).
+    </div>
+  </div>
+</div>
+
+<button class="btn" onclick="toggleSection('trees_section','btn_trees')" id="btn_trees" style="margin-bottom:8px;">▶ + ÁRBOLES FRUTALES (OPCIONAL) ◀</button>
+
+<div class="section" id="trees_section" style="display:none;">
+  <div class="section-header"><h2>🌳 ÁRBOLES FRUTALES</h2></div>
+  <div class="section-body">
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px;">
+      1 fruta/día en temporada. En invernadero: producen todo el año. Calidad mejora 1★ por año.
+    </div>
+    <div class="field">
+      <label>Árbol</label>
+      <select id="tree_type" onchange="loadTreeData()">
+        <optgroup label="── 🌸 Primavera ──">
+          <option value="apricot">Albaricoquero — 50g/fruta — brote 2000g</option>
+          <option value="cherry">Cerezo — 80g/fruta — brote 3400g</option>
+        </optgroup>
+        <optgroup label="── ☀️ Verano ──">
+          <option value="orange">Naranjo — 100g/fruta — brote 4000g</option>
+          <option value="peach">Melocotonero — 140g/fruta — brote 6000g</option>
+        </optgroup>
+        <optgroup label="── 🍂 Otoño ──">
+          <option value="apple">Manzano — 100g/fruta — brote 4000g</option>
+          <option value="pomegranate">Granado — 140g/fruta — brote 6000g</option>
+        </optgroup>
+        <optgroup label="── 🏝️ Isla / Invernadero ──">
+          <option value="banana">Platanero — 150g/fruta — brote gratis (Isla)</option>
+          <option value="mango">Mango — 130g/fruta — brote gratis (Isla)</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="field">
+      <label>Cantidad de árboles</label>
+      <input type="number" id="tree_count" value="10" min="1">
+    </div>
+    <div class="field">
+      <label>Año del árbol (calidad)</label>
+      <input type="number" id="tree_year" value="1" min="1" max="4">
+    </div>
+    <div class="field">
+      <label>¿En invernadero? (produce todo el año)</label>
+      <select id="tree_greenhouse">
+        <option value="0">No (solo su temporada)</option>
+        <option value="1">Sí (112 días/año)</option>
+      </select>
+    </div>
+    <div id="tree_info" style="font-size:13px;color:var(--text-dim);margin-top:6px;padding:6px;border:1px solid var(--border);background:var(--input-bg);"></div>
+  </div>
+</div>
+
+<button class="btn" onclick="toggleSection('fishing_section','btn_fishing')" id="btn_fishing" style="margin-bottom:8px;">▶ + PESCA (OPCIONAL) ◀</button>
+
+<div class="section" id="fishing_section" style="display:none;">
+  <div class="section-header"><h2>🎣 PESCA</h2></div>
+  <div class="section-body">
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px;">
+      Ahumador: ×2 precio base. Profesión Fisher +25%, Angler +50%.
+    </div>
+    <div class="field">
+      <label>Pez</label>
+      <select id="fish_type" onchange="loadFishData()">
+        <optgroup label="── 🌸 Primavera ──">
+          <option value="anchoa">Anchoa — 30g — Océano</option>
+          <option value="lubina">Lubina — 100g — Río</option>
+          <option value="pez_gato">Pez Gato — 200g — Río/Bosque (lluvia)</option>
+          <option value="pez_sol">Pez Sol — 30g — Río (sol/viento)</option>
+          <option value="arenque">Arenque — 30g — Océano</option>
+          <option value="anguila">Anguila — 85g — Océano (lluvia, noche)</option>
+          <option value="sardina">Sardina — 40g — Océano</option>
+          <option value="sabalo">Sábalo — 60g — Río (lluvia)</option>
+          <option value="platija">Platija — 100g — Océano/Isla</option>
+          <option value="fletan">Fletán — 80g — Océano (noche)</option>
+          <option value="leyenda">Leyenda ★ — 5000g — Lago montaña (lluvia, Nv.10)</option>
+        </optgroup>
+        <optgroup label="── ☀️ Verano ──">
+          <option value="pez_globo">Pez Globo — 200g — Océano (sol)</option>
+          <option value="atun">Atún — 100g — Océano/Isla</option>
+          <option value="trucha_arcoiris">Trucha Arcoíris — 65g — Río (sol)</option>
+          <option value="pez_gato_v">Pez Gato — 200g — Río/Bosque (lluvia)</option>
+          <option value="sauri">Saurí — 1000g — Río/Lago montaña</option>
+          <option value="pulpo">Pulpo — 150g — Océano</option>
+          <option value="pargo">Pargo — 50g — Océano (lluvia)</option>
+          <option value="superpepino">Superpepino — 250g — Océano/Isla (noche)</option>
+          <option value="esturion">Esturión — 200g — Lago montaña</option>
+          <option value="tilapia">Tilapia — 75g — Océano/Isla</option>
+          <option value="dorado">Dorado — 100g — Río Bosque</option>
+          <option value="salmonete">Salmonete — 30g — Océano</option>
+          <option value="pez_carmesi">Pez Carmesí ★ — 1500g — Océano este (Nv.5)</option>
+        </optgroup>
+        <optgroup label="── 🍂 Otoño ──">
+          <option value="perca_peq">Perca Boca Pequeña — 50g — Río/Bosque</option>
+          <option value="perca">Perca Boca Grande — 100g — Lago montaña</option>
+          <option value="salmon">Salmón — 75g — Río</option>
+          <option value="tiger_trout">Trucha Tigre — 150g — Río</option>
+          <option value="albacore">Albacora — 75g — Océano (mañana/noche)</option>
+          <option value="pez_madera">Pez Madera — 75g — Bosque secreto</option>
+          <option value="carpa">Carpa — 30g — Múltiples</option>
+          <option value="lucio">Lucio — 100g — Río (noche)</option>
+          <option value="void_salmon">Salmón del Vacío — 150g — Cloacas Bruja</option>
+          <option value="rape">Rape ★ — 900g — Río norte JojaMart (otoño)</option>
+          <option value="linterna">Pez Linterna — 120g — Lago montaña</option>
+        </optgroup>
+        <optgroup label="── ❄️ Invierno ──">
+          <option value="atun_inv">Atún — 100g — Océano</option>
+          <option value="sardina_inv">Sardina — 40g — Océano</option>
+          <option value="lucio_inv">Lucio — 100g — Río (noche)</option>
+          <option value="pez_hielo">Pez Hielo — 500g — Minas nv.60</option>
+          <option value="calamar">Calamar — 80g — Océano (noche)</option>
+          <option value="pepino_mar">Cohombro de Mar — 75g — Océano</option>
+          <option value="superpepino_i">Superpepino — 250g — Océano (noche)</option>
+          <option value="pez_piedra">Pez Piedra — 500g — Minas nv.20</option>
+          <option value="pez_fantasma_i">Pez Fantasma — 45g — Minas nv.20-60</option>
+          <option value="pez_glaciar">Pez Glaciar ★ — 1000g — Bosque Ceniza sur</option>
+          <option value="anguila_lava_i">Anguila de Lava — 700g — Minas nv.100</option>
+          <option value="carpa_mutante">Carpa Mutante ★ — 1000g — Cloacas</option>
+        </optgroup>
+        <optgroup label="── 🔵 Todo el año ──">
+          <option value="carpa_all">Carpa — 30g — Múltiples</option>
+          <option value="perca_peq_all">Perca Boca Pequeña — 50g — Río/Bosque</option>
+          <option value="pez_madera_all">Pez Madera — 75g — Bosque secreto</option>
+          <option value="perca_all">Perca Boca Grande — 100g — Lago montaña</option>
+          <option value="lucio_all">Lucio — 100g — Río (noche)</option>
+          <option value="void_salmon_all">Salmón del Vacío — 150g — Cloacas Bruja</option>
+          <option value="pez_fantasma_all">Pez Fantasma — 45g — Minas nv.20-60</option>
+          <option value="pez_piedra_all">Pez Piedra — 500g — Minas nv.20</option>
+          <option value="pez_hielo_all">Pez Hielo — 500g — Minas nv.60</option>
+          <option value="anguila_lava_all">Anguila de Lava — 700g — Minas nv.100</option>
+          <option value="carpa_mutante_all">Carpa Mutante ★ — 1000g — Cloacas</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="field">
+      <label>Precio base (editable)</label>
+      <input type="number" id="fish_price" value="40" min="1">
+    </div>
+    <div class="field">
+      <label>Peces capturados por día</label>
+      <input type="number" id="fish_per_day" value="10" min="1">
+    </div>
+    <div class="field">
+      <label>Días de pesca</label>
+      <input type="number" id="fish_days" value="28" min="1">
+    </div>
+    <div class="toggle-field">
+      <label for="fish_smoker">Usar Ahumador (×2 precio)</label>
+      <label class="toggle"><input type="checkbox" id="fish_smoker"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="toggle-field">
+      <label for="fish_fisher">Profesión Fisher (+25%)</label>
+      <label class="toggle"><input type="checkbox" id="fish_fisher"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="toggle-field">
+      <label for="fish_angler">Profesión Angler (+50%)</label>
+      <label class="toggle"><input type="checkbox" id="fish_angler"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+</div>
+
+<button class="btn" onclick="toggleSection('foraging_section','btn_foraging')" id="btn_foraging" style="margin-bottom:8px;">▶ + RECOLECCIÓN (OPCIONAL) ◀</button>
+
+<div class="section" id="foraging_section" style="display:none;">
+  <div class="section-header"><h2>🌿 RECOLECCIÓN</h2></div>
+  <div class="section-body">
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px;">
+      Deshidratador: ×7.5+25g por 5 unidades · 1 día. Profesión Botánico = siempre calidad Iridio.
+    </div>
+    <div class="field">
+      <label>Item recolectable</label>
+      <select id="forage_type" onchange="loadForageData()">
+        <optgroup label="── 🌸 Primavera ──">
+          <option value="rabano_silv">Rábano Silvestre — 50g</option>
+          <option value="narciso">Narciso — 80g</option>
+          <option value="puerro">Puerro — 60g</option>
+          <option value="diente_leon">Diente de León — 40g</option>
+          <option value="cebolleta">Cebolleta — 80g</option>
+          <option value="colmenilla">Colmenilla — 150g</option>
+          <option value="seta_comun_p">Seta Común — 40g</option>
+          <option value="frambuesa">Frambuesa — 50g</option>
+        </optgroup>
+        <optgroup label="── ☀️ Verano ──">
+          <option value="uva">Uva — 80g</option>
+          <option value="baya_esp">Baya Especiada — 80g</option>
+          <option value="guisante_dulce">Guisante Dulce — 50g</option>
+          <option value="seta_roja">Seta Roja — 75g</option>
+          <option value="helecho">Helecho — 90g</option>
+        </optgroup>
+        <optgroup label="── 🍂 Otoño ──">
+          <option value="seta_comun_o">Seta Común — 40g</option>
+          <option value="ciruela_salv">Ciruela Salvaje — 80g</option>
+          <option value="avellana">Avellana — 90g</option>
+          <option value="mora">Mora — 75g</option>
+          <option value="chantarela">Chantarela — 160g</option>
+          <option value="seta_lila">Seta Lila — 320g</option>
+        </optgroup>
+        <optgroup label="── ❄️ Invierno ──">
+          <option value="raiz_invernal">Raíz Invernal — 70g</option>
+          <option value="fruta_cristal">Fruta de Cristal — 150g</option>
+          <option value="name_nival">Ñame Nival — 100g</option>
+          <option value="azafran">Azafrán — 60g</option>
+          <option value="acebo">Acebo — 80g</option>
+        </optgroup>
+        <optgroup label="── 🏝️ Isla Jengibre ──">
+          <option value="jengibre">Jengibre — 60g</option>
+          <option value="coco">Coco — 100g</option>
+          <option value="piña">Piña — 100g</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="field">
+      <label>Precio base (editable)</label>
+      <input type="number" id="forage_price" value="50" min="1">
+    </div>
+    <div class="field">
+      <label>Unidades recolectadas por día</label>
+      <input type="number" id="forage_per_day" value="20" min="1">
+    </div>
+    <div class="field">
+      <label>Días de recolección</label>
+      <input type="number" id="forage_days" value="28" min="1">
+    </div>
+    <div class="toggle-field">
+      <label for="forage_dehydrator">Usar Deshidratador (×7.5+25g, 5 uds/batch)</label>
+      <label class="toggle"><input type="checkbox" id="forage_dehydrator"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="toggle-field">
+      <label for="forage_botanist">Profesión Botánico (siempre Iridio ×2)</label>
+      <label class="toggle"><input type="checkbox" id="forage_botanist"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="toggle-field">
+      <label for="forage_artisan_f">Profesión Artisan (+40% deshidratado)</label>
+      <label class="toggle"><input type="checkbox" id="forage_artisan_f"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+</div>
+
+<button class="btn" onclick="toggleSection('tapper_section','btn_tapper')" id="btn_tapper" style="margin-bottom:8px;">▶ + RESINERAS / ÁRBOLES (OPCIONAL) ◀</button>
+
+<div class="section" id="tapper_section" style="display:none;">
+  <div class="section-header"><h2>🌲 RESINERAS</h2></div>
+  <div class="section-body">
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px;">
+      Producen pasivamente. No se benefician de Artisan. Sí de Resinador (+25%). Producen todo el año salvo árboles seta (paran en invierno).
+    </div>
+    <div class="field">
+      <label>Producto</label>
+      <select id="tapper_type" onchange="loadTapperData()">
+        <option value="maple">Jarabe de Arce — 200g — Arce — 9 días</option>
+        <option value="oak">Resina de Roble — 150g — Roble — 7-8 días</option>
+        <option value="pine">Brea de Pino — 100g — Pino — 5-6 días</option>
+        <option value="mahogany">Savia — 15g — Caoba — 1 día</option>
+        <option value="mystic">Sirope Místico — 1000g — Árbol Místico — 7 días</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Cantidad de árboles</label>
+      <input type="number" id="tapper_count" value="10" min="1">
+    </div>
+    <div class="field">
+      <label>Días de producción</label>
+      <input type="number" id="tapper_days" value="28" min="1">
+    </div>
+    <div class="toggle-field">
+      <label for="tapper_heavy">Grifo pesado (reduce días a la mitad)</label>
+      <label class="toggle"><input type="checkbox" id="tapper_heavy"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="toggle-field">
+      <label for="tapper_tapper_prof">Profesión Resinador (+25%)</label>
+      <label class="toggle"><input type="checkbox" id="tapper_tapper_prof"><span class="toggle-slider"></span></label>
+    </div>
+    <div id="tapper_info" style="font-size:13px;color:var(--text-dim);margin-top:6px;padding:6px;border:1px solid var(--border);background:var(--input-bg);"></div>
+  </div>
+</div>
+  <div class="section-body">
+    <div style="font-size:13px;color:var(--text-dim);margin-bottom:8px;">
+      Los Envíos dan el <strong style="color:var(--text)">mismo precio</strong> que vender en tienda. La diferencia es que el dinero llega al día siguiente. No hay descuento. Artículos como armas solo se pueden vender al Gremio de Aventureros, no por envío.
+    </div>
+    <div class="toggle-field">
+      <label for="shipping_bin">Recordatorio: usar Caja de Envíos</label>
+      <label class="toggle"><input type="checkbox" id="shipping_bin"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+</div>
+
+<button class="btn calc-sticky" onclick="calculate()">▶ CALCULAR GANANCIAS ◀</button>
+
+<div class="results" id="results">
+  <div class="results-header"><h2>💰 RESULTADOS - TEMPORADA COMPLETA</h2></div>
+  <div class="results-grid">
+    <div class="result-card">
+      <div class="r-label">Cosechas totales</div>
+      <div class="r-value" id="r_harvests">—</div>
+      <div class="r-unit">veces</div>
+    </div>
+    <div class="result-card">
+      <div class="r-label">Días efectivos crecimiento</div>
+      <div class="r-value" id="r_grow_real">—</div>
+      <div class="r-unit">días</div>
+    </div>
+    <div class="result-card">
+      <div class="r-label">Precio ajustado calidad</div>
+      <div class="r-value" id="r_quality_price">—</div>
+      <div class="r-unit">oro/unidad</div>
+    </div>
+    <div class="result-card highlight">
+      <div class="r-label">Ganancia CRUDO</div>
+      <div class="r-value" id="r_raw">—</div>
+      <div class="r-unit">oro total</div>
+    </div>
+    <div class="result-card highlight">
+      <div class="r-label">Ganancia PROCESADO</div>
+      <div class="r-value" id="r_proc">—</div>
+      <div class="r-unit">oro total</div>
+    </div>
+    <div class="result-card best">
+      <div class="r-label">MEJOR OPCIÓN</div>
+      <div class="r-value" id="r_best">—</div>
+      <div class="r-unit"></div>
+    </div>
+    <div class="result-card">
+      <div class="r-label">Inversión total</div>
+      <div class="r-value" id="r_invest">—</div>
+      <div class="r-unit">oro</div>
+    </div>
+    <div class="result-card">
+      <div class="r-label">Oro/día (crudo)</div>
+      <div class="r-value" id="r_raw_day">—</div>
+      <div class="r-unit">oro/día</div>
+    </div>
+    <div class="result-card">
+      <div class="r-label">Oro/día (procesado)</div>
+      <div class="r-value" id="r_proc_day">—</div>
+      <div class="r-unit">oro/día</div>
+    </div>
+    <div class="result-card">
+      <div class="r-label">ROI (sobre inversión)</div>
+      <div class="r-value" id="r_roi">—</div>
+      <div class="r-unit">%</div>
+    </div>
+    <div class="result-card highlight" id="r_animals_card" style="display:none;">
+      <div class="r-label">Ganancia ANIMALES</div>
+      <div class="r-value" id="r_animals">—</div>
+      <div class="r-unit">oro/temporada</div>
+    </div>
+    <div class="result-card highlight" id="r_trees_card" style="display:none;">
+      <div class="r-label">Ganancia ÁRBOLES FRUTALES</div>
+      <div class="r-value" id="r_trees">—</div>
+      <div class="r-unit">oro/período</div>
+    </div>
+    <div class="result-card highlight" id="r_fish_card" style="display:none;">
+      <div class="r-label">Ganancia PESCA</div>
+      <div class="r-value" id="r_fish">—</div>
+      <div class="r-unit">oro/período</div>
+    </div>
+    <div class="result-card highlight" id="r_forage_card" style="display:none;">
+      <div class="r-label">Ganancia RECOLECCIÓN</div>
+      <div class="r-value" id="r_forage">—</div>
+      <div class="r-unit">oro/período</div>
+    </div>
+    <div class="result-card highlight" id="r_tapper_card" style="display:none;">
+      <div class="r-label">Ganancia RESINERAS</div>
+      <div class="r-value" id="r_tapper">—</div>
+      <div class="r-unit">oro/período</div>
+    </div>
+    <div class="result-card best" id="r_grand_total_card" style="display:none;grid-column:1/-1;">
+      <div class="r-label">TOTAL GENERAL</div>
+      <div class="r-value" id="r_grand_total">—</div>
+      <div class="r-unit">oro</div>
+    </div>
+  </div>
+  <div class="note" id="r_note"></div>
+</div>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
