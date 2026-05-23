@@ -113,16 +113,15 @@ input[type=number] { -moz-appearance: textfield; }
 ::-webkit-scrollbar { width: 8px; background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); }
 .animal-row {
-  display: grid; grid-template-columns: 1fr 80px 70px 70px 60px auto;
+  display: grid; grid-template-columns: 1fr 1fr 110px 60px 60px 60px auto;
   gap: 6px; align-items: center; margin-bottom: 8px;
   padding: 6px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 3px;
 }
 .animal-row select, .animal-row input {
   background: var(--surface2); border: 1px solid var(--border);
-  color: var(--text); font-family: 'VT323', monospace; font-size: 16px;
+  color: var(--text); font-family: 'VT323', monospace; font-size: 15px;
   padding: 3px 5px; outline: none; width: 100%; border-radius: 2px;
 }
-.animal-row label { font-size: 13px; color: var(--text-dim); }
 .animal-row .del-btn {
   background: var(--surface2); border: 1px solid var(--border);
   color: var(--text-dim); cursor: pointer; font-size: 14px; padding: 2px 6px;
@@ -130,7 +129,7 @@ input[type=number] { -moz-appearance: textfield; }
 }
 .animal-row .del-btn:hover { border-color: var(--accent); color: var(--accent); }
 .animal-header {
-  display: grid; grid-template-columns: 1fr 80px 70px 70px 60px auto;
+  display: grid; grid-template-columns: 1fr 1fr 110px 60px 60px 60px auto;
   gap: 6px; margin-bottom: 4px; padding: 0 6px;
   font-size: 13px; color: var(--text-dim);
 }

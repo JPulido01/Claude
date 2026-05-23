@@ -1,19 +1,28 @@
-// Base de datos de animales
-// precio_base: precio del producto con 0 amistad. Venta real = precio_base × (amistad/1000 + 0.3)
-// Con 5♥ (1000 amistad) = precio_base × 1.3
-// prod_dia: productos producidos por día por animal (con Auto-Petter o cuidado máximo)
-const ANIMALS_DB = {
-  "Gallina":         { products: [{name:"Huevo",       price:50,  freq:1}, {name:"Huevo XXL",   price:95,  freq:0}] },
-  "Gallina Marrón":  { products: [{name:"Huevo Marrón",price:50,  freq:1}, {name:"Huevo M.XXL", price:95,  freq:0}] },
-  "Gallina Azul":    { products: [{name:"Huevo",       price:50,  freq:1}, {name:"Huevo XXL",   price:95,  freq:0}] },
-  "Pato":            { products: [{name:"Huevo Pato",  price:95,  freq:1}, {name:"Pluma Pato",  price:250, freq:0}] },
-  "Vaca":            { products: [{name:"Leche",       price:125, freq:1}, {name:"Leche XXL",   price:190, freq:0}] },
-  "Cabra":           { products: [{name:"Leche Cabra", price:225, freq:1}, {name:"Leche C.XXL", price:345, freq:0}] },
-  "Oveja":           { products: [{name:"Lana",        price:340, freq:1}] },
-  "Cerdo":           { products: [{name:"Trufa",       price:625, freq:1}] },
-  "Conejo":          { products: [{name:"Lana",        price:340, freq:1}, {name:"Pata Conejo", price:565, freq:0}] },
-  "Avestruz":        { products: [{name:"Huevo Avest.", price:600, freq:1}] },
-};
+// Lista plana de productos animales con crudo y procesado
+// saleMult: precio crudo se multiplica por (amistad/1000+0.3) × rancher
+// processed: si existe, se puede vender procesado (no afecta amistad, sí Artisan excepto aceite)
+const ANIMAL_PRODUCTS = [
+  // Corral
+  {name:"Huevo",             price:50,  freq_days:1, processed:{name:"Mayonesa",          price:190,  machine:"Mayonesera", artisan:true,  qty:1}},
+  {name:"Huevo XXL",         price:95,  freq_days:1, processed:{name:"Mayonesa Oro",       price:380,  machine:"Mayonesera", artisan:true,  qty:1}},
+  {name:"Huevo Marrón",      price:50,  freq_days:1, processed:{name:"Mayonesa",           price:190,  machine:"Mayonesera", artisan:true,  qty:1}},
+  {name:"Huevo Marrón XXL",  price:95,  freq_days:1, processed:{name:"Mayonesa Oro",       price:380,  machine:"Mayonesera", artisan:true,  qty:1}},
+  {name:"Huevo Sombrio",     price:65,  freq_days:1, processed:{name:"Mayonesa Sombría",   price:275,  machine:"Mayonesera", artisan:true,  qty:1}},
+  {name:"Huevo Dorado",      price:500, freq_days:1, processed:{name:"Mayonesa Dorada",    price:380,  machine:"Mayonesera", artisan:true,  qty:3}},
+  {name:"Huevo de Pato",     price:95,  freq_days:1, processed:{name:"Mayonesa Pato",      price:375,  machine:"Mayonesera", artisan:true,  qty:1}},
+  {name:"Pluma de Pato",     price:250, freq_days:2, processed:null},
+  {name:"Huevo Dinosaurio",  price:350, freq_days:7, processed:{name:"Mayo. Dinosaurio",   price:800,  machine:"Mayonesera", artisan:true,  qty:1}},
+  {name:"Huevo Avestruz",    price:600, freq_days:7, processed:{name:"Mayonesa ×10",       price:1900, machine:"Mayonesera", artisan:true,  qty:10}},
+  {name:"Lana (Conejo)",     price:340, freq_days:4, processed:{name:"Tela",               price:470,  machine:"Telar",      artisan:true,  qty:1}},
+  {name:"Pata de Conejo",    price:565, freq_days:4, processed:null},
+  // Establo
+  {name:"Leche",             price:125, freq_days:1, processed:{name:"Queso",              price:230,  machine:"Prensa",     artisan:true,  qty:1}},
+  {name:"Leche XXL",         price:190, freq_days:1, processed:{name:"Queso Oro",          price:345,  machine:"Prensa",     artisan:true,  qty:1}},
+  {name:"Leche de Cabra",    price:225, freq_days:2, processed:{name:"Queso Cabra",        price:400,  machine:"Prensa",     artisan:true,  qty:1}},
+  {name:"Leche Cabra XXL",   price:345, freq_days:2, processed:{name:"Queso Cabra Oro",    price:600,  machine:"Prensa",     artisan:true,  qty:1}},
+  {name:"Lana (Oveja)",      price:340, freq_days:3, processed:{name:"Tela",               price:470,  machine:"Telar",      artisan:true,  qty:1}},
+  {name:"Trufa",             price:625, freq_days:1, processed:{name:"Aceite de Trufa",    price:1065, machine:"Aceitera",   artisan:false, qty:1}},
+];
 
 let animalRowCount = 0;
 
@@ -22,54 +31,65 @@ function toggleAnimals() {
   const btn = document.getElementById('btn_animals');
   if (sec.style.display === 'none') {
     sec.style.display = 'block';
-    btn.textContent = '▶ - OCULTAR ANIMALES ◀';
+    btn.textContent = '▶ - OCULTAR PRODUCTOS ANIMALES ◀';
     if (animalRowCount === 0) addAnimalRow();
   } else {
     sec.style.display = 'none';
-    btn.textContent = '▶ + AGREGAR ANIMALES (OPCIONAL) ◀';
+    btn.textContent = '▶ + PRODUCTOS ANIMALES (OPCIONAL) ◀';
+  }
+}
+
+function buildProductOpts() {
+  return ANIMAL_PRODUCTS.map((p, i) => {
+    const fd   = p.freq_days > 1 ? ` c/${p.freq_days}d` : '/día';
+    const proc = p.processed ? ` → ${p.processed.name} ${p.processed.price * p.processed.qty}g` : '';
+    return `<option value="${i}">${p.name} — ${p.price}g${fd}${proc}</option>`;
+  }).join('');
+}
+
+function updateSaleOpts(id) {
+  const idx     = parseInt(document.getElementById(`animal_prod_${id}`).value) || 0;
+  const prod    = ANIMAL_PRODUCTS[idx];
+  const saleSel = document.getElementById(`animal_sale_${id}`);
+  if (prod && prod.processed) {
+    const procTotal = prod.processed.price * prod.processed.qty;
+    saleSel.innerHTML =
+      `<option value="raw">Crudo — ${prod.price}g</option>` +
+      `<option value="proc">Procesado — ${prod.processed.name} ${procTotal}g</option>`;
+  } else {
+    saleSel.innerHTML = `<option value="raw">Crudo — ${prod ? prod.price : 0}g</option>`;
   }
 }
 
 function addAnimalRow() {
   const container = document.getElementById('animal_rows');
   if (animalRowCount === 0) {
-    const header = document.createElement('div');
-    header.className = 'animal-header';
-    header.id = 'animal_header';
-    header.innerHTML = '<span>Animal</span><span>Producto</span><span>Cantidad</span><span>Amistad (♥)</span><span>Prod/día</span><span></span>';
-    container.appendChild(header);
+    const hdr = document.createElement('div');
+    hdr.className = 'animal-header';
+    hdr.id = 'animal_header';
+    hdr.innerHTML = '<span>Producto</span><span>Venta</span><span>Cantidad</span><span>Amistad</span><span>Prob.</span><span></span>';
+    container.appendChild(hdr);
   }
-  const id = animalRowCount++;
+  const id  = animalRowCount++;
   const row = document.createElement('div');
   row.className = 'animal-row';
   row.id = `animal_row_${id}`;
-
-  const animalOpts = Object.keys(ANIMALS_DB).map(k => `<option value="${k}">${k}</option>`).join('');
-  const firstAnimal = Object.keys(ANIMALS_DB)[0];
-  const prodOpts = ANIMALS_DB[firstAnimal].products.map(p => `<option value="${p.price}">${p.name} (${p.price}g)</option>`).join('');
-
   row.innerHTML = `
-    <select onchange="updateAnimalProducts(${id})"  id="animal_type_${id}">${animalOpts}</select>
-    <select id="animal_prod_${id}">${prodOpts}</select>
+    <select id="animal_prod_${id}" onchange="updateSaleOpts(${id})">${buildProductOpts()}</select>
+    <select id="animal_sale_${id}"></select>
     <input type="number" id="animal_count_${id}" value="4" min="1">
     <select id="animal_hearts_${id}">
-      <option value="200">1♥ (200)</option>
-      <option value="400">2♥ (400)</option>
-      <option value="600">3♥ (600)</option>
-      <option value="800">4♥ (800)</option>
-      <option value="1000" selected>5♥ (1000)</option>
+      <option value="200">1♥</option>
+      <option value="400">2♥</option>
+      <option value="600">3♥</option>
+      <option value="800">4♥</option>
+      <option value="1000" selected>5♥</option>
     </select>
-    <input type="number" id="animal_freq_${id}" value="1" min="0" max="1" step="0.1">
+    <input type="number" id="animal_prob_${id}" value="1" min="0" max="1" step="0.1" title="Probabilidad">
     <button class="del-btn" onclick="removeAnimalRow(${id})">✕</button>
   `;
   container.appendChild(row);
-}
-
-function updateAnimalProducts(id) {
-  const animal = document.getElementById(`animal_type_${id}`).value;
-  const prodSel = document.getElementById(`animal_prod_${id}`);
-  prodSel.innerHTML = ANIMALS_DB[animal].products
-    .map(p => `<option value="${p.price}">${p.name} (${p.price}g)</option>`).join('');
+  updateSaleOpts(id);
 }
 
 function removeAnimalRow(id) {
@@ -85,16 +105,27 @@ function removeAnimalRow(id) {
 function calcAnimals(seasonDays) {
   const rows = document.querySelectorAll('.animal-row');
   if (rows.length === 0) return 0;
+  const artisanMult = document.getElementById('artisan').checked ? 1.4 : 1.0;
+  const rancherMult = document.getElementById('rancher').checked ? 1.2 : 1.0;
   let total = 0;
   rows.forEach(row => {
-    const id = row.id.replace('animal_row_', '');
-    const price    = parseFloat(document.getElementById(`animal_prod_${id}`).value)  || 0;
-    const count    = parseFloat(document.getElementById(`animal_count_${id}`).value) || 0;
-    const hearts   = parseFloat(document.getElementById(`animal_hearts_${id}`).value)|| 1000;
-    const freq     = parseFloat(document.getElementById(`animal_freq_${id}`).value)  || 1;
-    const saleMult = hearts / 1000 + 0.3;
-    const salePrice = price * saleMult;
-    total += salePrice * freq * count * seasonDays;
+    const id   = row.id.replace('animal_row_', '');
+    const idx  = parseInt(document.getElementById(`animal_prod_${id}`).value) || 0;
+    const mode = document.getElementById(`animal_sale_${id}`).value;
+    const count  = parseFloat(document.getElementById(`animal_count_${id}`).value)  || 0;
+    const hearts = parseFloat(document.getElementById(`animal_hearts_${id}`).value) || 1000;
+    const prob   = parseFloat(document.getElementById(`animal_prob_${id}`).value)   || 1;
+    const prod   = ANIMAL_PRODUCTS[idx];
+    if (!prod) return;
+    const productions = seasonDays / (prod.freq_days || 1);
+    let salePrice;
+    if (mode === 'proc' && prod.processed) {
+      const am = prod.processed.artisan ? artisanMult : 1.0;
+      salePrice = prod.processed.price * prod.processed.qty * am;
+    } else {
+      salePrice = prod.price * (hearts / 1000 + 0.3) * rancherMult;
+    }
+    total += salePrice * prob * count * productions;
   });
   return total;
 }
