@@ -193,6 +193,7 @@ input[type=number] { -moz-appearance: textfield; }
 .crop-table .crop-name  { color: var(--text); }
 .crop-table .crop-buy,
 .crop-table .crop-sell  { text-align: right; color: var(--text-dim); white-space: nowrap; }
+.crop-table .crop-harvests { text-align: center; color: var(--accent); white-space: nowrap; font-size: 15px; }
 .crop-table .crop-qty-cell { text-align: right; }
 .crop-qty {
   width: 68px; background: var(--input-bg); border: 1px solid var(--border);

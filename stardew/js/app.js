@@ -301,6 +301,7 @@ function updateFertCost() {
   const speedCost = parseInt(speedSel.selectedOptions[0].dataset.cost) || 0;
   const qualCost  = parseInt(qualSel.selectedOptions[0].dataset.cost)  || 0;
   document.getElementById('fert_cost').value = speedCost + qualCost;
+  updateCropHarvests();
 }
 
 // ─── RECOLECCIÓN ────────────────────────────────────────────
@@ -398,7 +399,7 @@ function buildCropTable() {
       lastSeason = crop.season;
       const tr = document.createElement('tr');
       tr.className = 'crop-season-row';
-      tr.innerHTML = `<td colspan="4">${crop.season}</td>`;
+      tr.innerHTML = `<td colspan="5">${crop.season}</td>`;
       tbody.appendChild(tr);
     }
     // Etiquetas extra
@@ -414,10 +415,44 @@ function buildCropTable() {
       <td class="crop-name">${name}${badges.length ? `<small style="color:var(--text-dim);font-size:13px;">(${badges.join(' · ')})</small>` : ''}</td>
       <td class="crop-buy">${crop.seed > 0 ? crop.seed + 'g' : '—'}</td>
       <td class="crop-sell">${crop.sell}g</td>
+      <td class="crop-harvests" data-crop="${name}">—</td>
       <td class="crop-qty-cell"><input type="number" class="crop-qty" data-crop="${name}" value="0" min="0" placeholder="0"></td>
     `;
     tbody.appendChild(tr);
   }
+  updateCropHarvests();
+}
+
+function updateCropHarvests() {
+  const seasonDays = parseFloat(document.getElementById('season_days').value) || 28;
+  const agri       = document.getElementById('agriculturist').checked ? 0.10 : 0;
+  const speedBonus = parseFloat(document.getElementById('fertilizer').value) || 0;
+  const totalSpeed = agri + speedBonus;
+
+  document.querySelectorAll('.crop-harvests').forEach(cell => {
+    const name = cell.dataset.crop;
+    const crop = CROPS_DB[name];
+    if (!crop) return;
+
+    const growReal = Math.max(1, Math.ceil(crop.grow * (1 - totalSpeed)));
+    const regrow   = crop.regrow || 0;
+    let text;
+
+    if (regrow > 0) {
+      const harvests    = seasonDays >= growReal
+        ? 1 + Math.max(0, Math.floor((seasonDays - growReal) / regrow))
+        : 0;
+      const regrowCount = Math.max(0, harvests - 1);
+      text = harvests > 0 ? `1+${regrowCount} 🔄` : '—';
+    } else {
+      const harvests = seasonDays >= growReal
+        ? Math.floor(seasonDays / growReal)
+        : 0;
+      text = harvests > 0 ? `${harvests}×` : '—';
+    }
+
+    cell.textContent = text;
+  });
 }
 
 function calcCrops(seasonDays) {
@@ -641,6 +676,7 @@ function toggleGreenhouseMode() {
   const info = document.getElementById('gh_info');
   info.style.display = active ? 'block' : 'none';
   document.getElementById('season_days').value = active ? 112 : 28;
+  updateCropHarvests();
 }
 
 // ─── AUXILIARES ─────────────────────────────────────────────
@@ -658,3 +694,7 @@ function toggleSection(sectionId, btnId) {
 
 buildCropTable();
 updateProcessNote();
+
+// Actualizar cosechas cuando cambien los parámetros que las afectan
+document.getElementById('season_days').addEventListener('input',  updateCropHarvests);
+document.getElementById('agriculturist').addEventListener('change', updateCropHarvests);
