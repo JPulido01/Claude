@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Calculadora de Cultivos — Stardew Valley</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="stardew_styles.css">
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 <div class="container">
@@ -89,109 +89,41 @@
 
 <div id="crops_section" style="display:none;">
 
-<div class="grid">
-  <div class="section">
-    <div class="section-header"><h2>🌱 SELECCIONAR CULTIVO</h2></div>
-    <div class="section-body">
-      <div class="field">
-        <label>Cultivo</label>
-        <select id="crop" onchange="loadCropData()" style="min-width:180px;"></select>
-      </div>
-      <div id="crop_summary" class="crop-summary" style="margin-top:8px;margin-bottom:0;"></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-header"><h2>📊 PARÁMETROS</h2></div>
-    <div class="section-body">
-      <div class="field">
-        <label>Cantidad de plantas</label>
-        <input type="number" id="plants" value="100" min="1">
-      </div>
-      <div class="field">
-        <label>Espacio disponible (tiles)</label>
-        <input type="number" id="tiles" value="100" min="1">
-      </div>
-      <div class="field">
-        <label>Días de temporada</label>
-        <input type="number" id="season_days" value="28" min="1">
-      </div>
-      <div class="toggle-field">
-        <label for="greenhouse_mode">🏡 Invernadero (112 días/año, sin límite de temporada)</label>
-        <label class="toggle"><input type="checkbox" id="greenhouse_mode" onchange="toggleGreenhouseMode()"><span class="toggle-slider"></span></label>
-      </div>
-      <div id="gh_info" style="font-size:13px;color:var(--text-dim);margin-top:4px;display:none;">
-        ✓ Días fijados en 112 · Espacio útil: 120 tiles (10×12)
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="section">
-  <div class="section-header"><h2>📝 DATOS DEL CULTIVO (editables)</h2></div>
+  <div class="section-header"><h2>📊 PARÁMETROS</h2></div>
   <div class="section-body">
     <div class="field">
-      <label>Costo semilla (g)</label>
-      <input type="number" id="seed_cost" value="0" min="0">
-    </div>
-    <div class="field">
-      <label>Precio venta base (g)</label>
-      <input type="number" id="sell_price" value="0" min="0">
-    </div>
-    <div class="field">
-      <label>Días de crecimiento</label>
-      <input type="number" id="grow_days" value="0" min="1">
-    </div>
-    <div class="field">
-      <label>Días de rebrote (0=no rebrota)</label>
-      <input type="number" id="regrow_days" value="0" min="0">
-    </div>
-    <div class="field">
-      <label>Unidades por cosecha</label>
-      <input type="number" id="multi" value="1" min="1">
+      <label>Días de temporada</label>
+      <input type="number" id="season_days" value="28" min="1">
     </div>
     <div class="toggle-field">
-      <label for="seeds_purchased">Semillas compradas (descuenta el costo de las ganancias)</label>
+      <label for="greenhouse_mode">🏡 Invernadero (112 días/año, sin límite de temporada)</label>
+      <label class="toggle"><input type="checkbox" id="greenhouse_mode" onchange="toggleGreenhouseMode()"><span class="toggle-slider"></span></label>
+    </div>
+    <div id="gh_info" style="font-size:13px;color:var(--text-dim);margin-top:4px;display:none;">
+      ✓ Días fijados en 112 · Espacio útil: 120 tiles (10×12)
+    </div>
+    <div class="toggle-field" style="margin-top:8px;">
+      <label for="seeds_purchased">Semillas compradas (descuenta costo de las ganancias)</label>
       <label class="toggle"><input type="checkbox" id="seeds_purchased" checked><span class="toggle-slider"></span></label>
     </div>
-    <div id="crop_note" style="font-size:13px;color:var(--text-dim);margin-top:6px;display:none;padding:4px 0;"></div>
   </div>
 </div>
 
 <div class="section">
-  <div class="section-header"><h2>🍷 PROCESAMIENTO</h2></div>
-  <div class="section-body">
-    <div class="field">
-      <label>Máquina / Producto</label>
-      <select id="process_type" onchange="updateProcessNote()">
-        <optgroup label="── TONEL (Keg) ──">
-          <option value="keg_wine">Vino (fruta) — ×3, 7 días</option>
-          <option value="keg_juice">Jugo (vegetal) — ×2.25, 4 días</option>
-          <option value="keg_mead">Hidromiel (miel) — 300g fijo, 10h</option>
-          <option value="keg_pale_ale">Cerveza Pálida (lúpulo) — 300g fijo, ~1.5 días</option>
-          <option value="keg_beer">Cerveza (trigo) — 200g fijo, 1 día</option>
-        </optgroup>
-        <optgroup label="── BARRIL (Cask) ──">
-          <option value="cask_wine">Barril Vino/Mermelada — ×3 fruta, 7 días</option>
-          <option value="cask_juice">Barril Zumo/Encurtido — ×2.25 vegetal, 4 días</option>
-        </optgroup>
-        <optgroup label="── ENVASADORA (Preserves Jar) ──">
-          <option value="jar_jam">Mermelada (fruta) — ×2+50g, 2-3 días</option>
-          <option value="jar_pickle">Encurtido (vegetal) — ×2+50g, 2-3 días</option>
-        </optgroup>
-        <optgroup label="── OTRAS ──">
-          <option value="dryer_fruit">Deshidratador Fruta — ×7.5+25g, 1 día (5 uds)</option>
-          <option value="dryer_mushroom">Deshidratador Setas — ×7.5+25g, 1 día (5 uds)</option>
-          <option value="smoker">Ahumador Pescado — ×2, 50 min</option>
-          <option value="loom">Telar (lana→tela) — 470g fijo, 4h</option>
-        </optgroup>
-      </select>
-    </div>
-    <div class="field">
-      <label>Kegs/máquinas disponibles</label>
-      <input type="number" id="kegs" value="50" min="0">
-    </div>
-    <div id="process_note" style="font-size:13px;color:var(--text-dim);margin-top:6px;padding:6px;border:1px solid var(--border);background:var(--input-bg);"></div>
+  <div class="section-header"><h2>🌱 CULTIVOS — cantidad de plantas por cultivo</h2></div>
+  <div class="section-body" style="padding:0;overflow-x:auto;">
+    <table class="crop-table" id="crop_table">
+      <thead>
+        <tr>
+          <th>Cultivo</th>
+          <th>Precio de Compra</th>
+          <th>Precio de Venta</th>
+          <th>Cantidad Cultivada</th>
+        </tr>
+      </thead>
+      <tbody id="crop_table_body"></tbody>
+    </table>
   </div>
 </div>
 
@@ -498,52 +430,52 @@
 <div class="results" id="results">
   <div class="results-header"><h2>💰 RESULTADOS - TEMPORADA COMPLETA</h2></div>
   <div class="results-grid">
-    <div class="result-card">
+    <div class="result-card" id="r_harvests_card" style="display:none;">
       <div class="r-label">Cosechas totales</div>
       <div class="r-value" id="r_harvests">—</div>
       <div class="r-unit">veces</div>
     </div>
-    <div class="result-card">
+    <div class="result-card" id="r_grow_real_card" style="display:none;">
       <div class="r-label">Días efectivos crecimiento</div>
       <div class="r-value" id="r_grow_real">—</div>
       <div class="r-unit">días</div>
     </div>
-    <div class="result-card">
+    <div class="result-card" id="r_quality_price_card" style="display:none;">
       <div class="r-label">Precio ajustado calidad</div>
       <div class="r-value" id="r_quality_price">—</div>
       <div class="r-unit">oro/unidad</div>
     </div>
-    <div class="result-card highlight">
+    <div class="result-card highlight" id="r_raw_card" style="display:none;">
       <div class="r-label">Ganancia CRUDO</div>
       <div class="r-value" id="r_raw">—</div>
       <div class="r-unit">oro total</div>
     </div>
-    <div class="result-card highlight">
+    <div class="result-card highlight" id="r_proc_card" style="display:none;">
       <div class="r-label">Ganancia PROCESADO</div>
       <div class="r-value" id="r_proc">—</div>
       <div class="r-unit">oro total</div>
     </div>
-    <div class="result-card best">
+    <div class="result-card best" id="r_best_card" style="display:none;">
       <div class="r-label">MEJOR OPCIÓN</div>
       <div class="r-value" id="r_best">—</div>
       <div class="r-unit"></div>
     </div>
-    <div class="result-card">
+    <div class="result-card" id="r_invest_card" style="display:none;">
       <div class="r-label">Inversión total</div>
       <div class="r-value" id="r_invest">—</div>
       <div class="r-unit">oro</div>
     </div>
-    <div class="result-card">
+    <div class="result-card" id="r_raw_day_card" style="display:none;">
       <div class="r-label">Oro/día (crudo)</div>
       <div class="r-value" id="r_raw_day">—</div>
       <div class="r-unit">oro/día</div>
     </div>
-    <div class="result-card">
+    <div class="result-card" id="r_proc_day_card" style="display:none;">
       <div class="r-label">Oro/día (procesado)</div>
       <div class="r-value" id="r_proc_day">—</div>
       <div class="r-unit">oro/día</div>
     </div>
-    <div class="result-card">
+    <div class="result-card" id="r_roi_card" style="display:none;">
       <div class="r-label">ROI (sobre inversión)</div>
       <div class="r-value" id="r_roi">—</div>
       <div class="r-unit">%</div>
@@ -588,6 +520,6 @@
 </div>
 
 </div>
-<script src="stardew_app.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

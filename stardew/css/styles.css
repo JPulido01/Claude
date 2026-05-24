@@ -169,3 +169,35 @@ input[type=number] { -moz-appearance: textfield; }
   padding: 4px 8px; background: rgba(230,126,34,0.08);
   border: 1px solid rgba(230,126,34,0.3); border-radius: 3px;
 }
+
+/* ── Tabla multi-cultivo ─────────────────────────────────────── */
+.crop-table {
+  width: 100%; border-collapse: collapse; font-size: 17px;
+}
+.crop-table th {
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: var(--accent); padding: 8px 6px; text-align: left;
+  border-bottom: 2px solid var(--border-light);
+  background: var(--surface2); white-space: nowrap;
+}
+.crop-table th:nth-child(2),
+.crop-table th:nth-child(3),
+.crop-table th:nth-child(4) { text-align: right; }
+.crop-table td { padding: 3px 6px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.crop-table .crop-season-row td {
+  background: var(--surface2); color: var(--text-dim);
+  font-size: 14px; padding: 5px 8px; letter-spacing: 1px;
+  border-bottom: 1px solid var(--border-light);
+}
+.crop-table .crop-row:hover td { background: rgba(231,76,60,0.04); }
+.crop-table .crop-name  { color: var(--text); }
+.crop-table .crop-buy,
+.crop-table .crop-sell  { text-align: right; color: var(--text-dim); white-space: nowrap; }
+.crop-table .crop-qty-cell { text-align: right; }
+.crop-qty {
+  width: 68px; background: var(--input-bg); border: 1px solid var(--border);
+  color: var(--text); font-family: 'VT323', monospace; font-size: 18px;
+  padding: 2px 4px; text-align: right; border-radius: 3px; outline: none;
+}
+.crop-qty:focus { border-color: var(--accent); }
+.crop-qty[value="0"] { color: var(--text-dim); }

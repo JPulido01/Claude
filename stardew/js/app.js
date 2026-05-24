@@ -203,11 +203,12 @@ const PROCESS_DATA = {
   loom:           { mult:0,    fixed:470, days:0.17, batch:1, note:"Telar · Tela · 470g fijo (entrada: Lana) · 4 horas por batch" },
 };
 
-const PROCESS_NOTES_EL = () => document.getElementById('process_note');
 function updateProcessNote() {
-  const type = document.getElementById('process_type').value;
-  const el = PROCESS_NOTES_EL();
-  if (el && PROCESS_DATA[type]) el.textContent = PROCESS_DATA[type].note;
+  const typeEl = document.getElementById('process_type');
+  const noteEl = document.getElementById('process_note');
+  if (!typeEl || !noteEl) return;
+  const data = PROCESS_DATA[typeEl.value];
+  if (data) noteEl.textContent = data.note;
 }
 
 // Tablas exactas de la wiki por nivel de Agricultura (0-14)
@@ -384,176 +385,125 @@ function calcForage() {
   }
 }
 
-function loadCrops() {
-  const select = document.getElementById('crop');
-  select.innerHTML = '';
+// ─── TABLA MULTI-CULTIVO ─────────────────────────────────────
+function buildCropTable() {
+  const tbody = document.getElementById('crop_table_body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
   let lastSeason = '';
   for (const name in CROPS_DB) {
     const crop = CROPS_DB[name];
+    // Cabecera de temporada
     if (crop.season !== lastSeason) {
-      const grp = document.createElement('optgroup');
-      grp.label = '── ' + crop.season + ' ──';
-      select.appendChild(grp);
       lastSeason = crop.season;
+      const tr = document.createElement('tr');
+      tr.className = 'crop-season-row';
+      tr.innerHTML = `<td colspan="4">${crop.season}</td>`;
+      tbody.appendChild(tr);
     }
-    const opt = document.createElement('option');
-    opt.value = name;
-    opt.textContent = name + ' (' + crop.sell + 'g · ' + crop.grow + 'd)';
-    select.appendChild(opt);
+    // Etiquetas extra
+    const badges = [];
+    if (crop.regrow > 0) badges.push(`🔄${crop.regrow}d`);
+    if (crop.multi  > 1) badges.push(`×${crop.multi}`);
+    if (crop.noTiller)   badges.push('no Tiller');
+
+    const tr = document.createElement('tr');
+    tr.className = 'crop-row';
+    tr.dataset.crop = name;
+    tr.innerHTML = `
+      <td class="crop-name">${name}${badges.length ? ' <small style="color:var(--text-dim);font-size:13px;">(${badges.join(' · ')})</small>' : ''}</td>
+      <td class="crop-buy">${crop.seed > 0 ? crop.seed + 'g' : '—'}</td>
+      <td class="crop-sell">${crop.sell}g</td>
+      <td class="crop-qty-cell"><input type="number" class="crop-qty" data-crop="${name}" value="0" min="0" placeholder="0"></td>
+    `;
+    tbody.appendChild(tr);
   }
-  loadCropData();
 }
 
-function loadCropData() {
-  const cropName = document.getElementById('crop').value;
-  const crop = CROPS_DB[cropName];
-  if (!crop) return;
-  document.getElementById('seed_cost').value   = crop.seed;
-  document.getElementById('sell_price').value  = crop.sell;
-  document.getElementById('grow_days').value   = crop.grow;
-  document.getElementById('regrow_days').value = crop.regrow;
-  document.getElementById('multi').value       = crop.multi || 1;
+function calcCrops(seasonDays) {
+  const seedsPurchased = document.getElementById('seeds_purchased').checked;
+  const tillerRaw    = document.getElementById('tiller').checked        ? 0.10 : 0;
+  const agriculturist= document.getElementById('agriculturist').checked ? 0.10 : 0;
+  const speedBonus   = parseFloat(document.getElementById('fertilizer').value) || 0;
+  const qualFert     = document.getElementById('quality_fert').value;
+  const farmingLevel = parseInt(document.getElementById('farming_level').value) || 0;
+  const qualMult     = avgQualityMult(qualFert, farmingLevel);
+  const fertCost     = parseFloat(document.getElementById('fert_cost').value) || 0;
+  const totalSpeed   = agriculturist + speedBonus;
 
-  // Card resumen
-  const sumEl = document.getElementById('crop_summary');
-  const parts = [
-    `<strong>${crop.season}</strong>`,
-    `Semilla: <strong>${crop.seed}g</strong>`,
-    `Venta: <strong>${crop.sell}g</strong>`,
-    `Crece: <strong>${crop.grow}d</strong>`,
-    crop.regrow > 0 ? `Rebrota: <strong>cada ${crop.regrow}d</strong>` : 'Sin rebrote',
-    crop.multi > 1  ? `×${crop.multi}/cosecha` : '',
-  ].filter(Boolean).join(' · ');
-  sumEl.innerHTML = parts;
-  sumEl.style.display = 'block';
+  let totalProfit = 0;
+  let totalInvest = 0;
 
-  // Nota especial
-  const noteEl = document.getElementById('crop_note');
-  const notes = [];
-  if (crop.multi && crop.multi > 1) notes.push(`Produce ${crop.multi} uds/cosecha`);
-  if (crop.noTiller) notes.push('No beneficia de Tiller');
-  if (crop.seedSource) notes.push(`Semilla: ${crop.seedSource}`);
-  if (notes.length > 0) {
-    noteEl.textContent = '⚠ ' + notes.join(' · ');
-    noteEl.style.display = 'block';
-  } else {
-    noteEl.style.display = 'none';
-  }
+  document.querySelectorAll('.crop-qty').forEach(input => {
+    const qty = parseFloat(input.value) || 0;
+    if (qty <= 0) return;
+
+    const name = input.dataset.crop;
+    const crop = CROPS_DB[name];
+    if (!crop) return;
+
+    const noTiller = crop.noTiller || false;
+    const tiller   = noTiller ? 0 : tillerRaw;
+    const multi    = crop.multi || 1;
+    const growReal = Math.max(1, Math.ceil(crop.grow * (1 - totalSpeed)));
+    const regrow   = crop.regrow || 0;
+
+    let harvests, replants;
+    if (regrow > 0) {
+      harvests = seasonDays >= growReal ? 1 + Math.max(0, Math.floor((seasonDays - growReal) / regrow)) : 0;
+      replants = 0;
+    } else {
+      harvests = seasonDays >= growReal ? Math.floor(seasonDays / growReal) : 0;
+      replants = Math.max(0, harvests - 1);
+    }
+
+    const rawSellPrice  = crop.sell * qualMult * (1 + tiller);
+    const totalUnits    = harvests * qty * multi;
+    const seedDeduction = seedsPurchased ? crop.seed * qty * (1 + replants) : 0;
+    const invest        = seedDeduction + (fertCost * qty);
+    const profit        = (rawSellPrice * totalUnits) - invest;
+
+    totalProfit += profit;
+    totalInvest += invest;
+  });
+
+  return { profit: totalProfit, invest: totalInvest };
 }
 
 function fmt(n) { return Math.round(n).toLocaleString('es-CO') + 'g'; }
 
 function calculate() {
-  const plants     = parseFloat(document.getElementById('plants').value)     || 0;
-  const tiles      = parseFloat(document.getElementById('tiles').value)      || 100;
-  const seasonDays = parseFloat(document.getElementById('season_days').value)|| 28;
-  const seedCost   = parseFloat(document.getElementById('seed_cost').value)  || 0;
-  const sellPrice  = parseFloat(document.getElementById('sell_price').value) || 0;
-  const growDays   = parseFloat(document.getElementById('grow_days').value)  || 1;
-  const regrowDays = parseFloat(document.getElementById('regrow_days').value)|| 0;
-  const multiYield = parseFloat(document.getElementById('multi').value)      || 1;
-  const kegs       = parseFloat(document.getElementById('kegs').value)       || 0;
-  const fertCost   = parseFloat(document.getElementById('fert_cost').value)  || 0;
-  const cropsVisible   = document.getElementById('crops_section').style.display !== 'none';
-  const seedsPurchased = document.getElementById('seeds_purchased').checked;
+  const seasonDays   = parseFloat(document.getElementById('season_days').value) || 28;
+  const cropsVisible = document.getElementById('crops_section').style.display !== 'none';
 
-  // noTiller: Grano de café y otros cultivos que el juego no considera verdura/fruta
-  const cropName   = document.getElementById('crop').value;
-  const cropData   = CROPS_DB[cropName] || {};
-  const noTiller   = cropData.noTiller || false;
+  // ─── CULTIVOS (tabla multi-cultivo) ────────────────────────
+  const cropResult     = cropsVisible ? calcCrops(seasonDays) : { profit: 0, invest: 0 };
+  const bestCropProfit = cropResult.profit;
+  const totalCropInvest= cropResult.invest;
 
-  const tillerRaw    = document.getElementById('tiller').checked       ? 0.10 : 0;
-  const tiller       = noTiller ? 0 : tillerRaw;
-  const artisan      = document.getElementById('artisan').checked      ? 0.40 : 0;
-  const agriculturist= document.getElementById('agriculturist').checked? 0.10 : 0;
-  const speedBonus   = parseFloat(document.getElementById('fertilizer').value) || 0;
-  const qualFert     = document.getElementById('quality_fert').value;
-  const farmingLevel = parseInt(document.getElementById('farming_level').value) || 0;
-  const processType  = document.getElementById('process_type').value;
-  const processData  = PROCESS_DATA[processType];
-
-  // Días de crecimiento ajustados
-  const totalSpeed = agriculturist + speedBonus;
-  const growReal   = Math.max(1, Math.ceil(growDays * (1 - totalSpeed)));
-
-  // Cosechas y replantaciones
-  let harvests, replants;
-  if (regrowDays > 0) {
-    harvests = seasonDays >= growReal
-      ? 1 + Math.max(0, Math.floor((seasonDays - growReal) / regrowDays))
-      : 0;
-    replants = 0;
-  } else {
-    harvests = seasonDays >= growReal ? Math.floor(seasonDays / growReal) : 0;
-    replants = Math.max(0, harvests - 1);
-  }
-
-  // Precio ajustado por calidad según nivel de Agricultura
-  const qualMult       = avgQualityMult(qualFert, farmingLevel);
-  const qualAdjPrice   = sellPrice * qualMult;
-
-  // Inversión total
-  const seedDeductionTotal = seedsPurchased ? seedCost * plants * (1 + replants) : 0;
-  const totalInvest = cropsVisible ? (seedDeductionTotal + (fertCost * tiles)) : 0;
-
-  // CRUDO con calidad y multi-cosecha
-  const rawSellPrice = qualAdjPrice * (1 + tiller);
-  const totalUnitsRaw = harvests * plants * multiYield;
-  const rawProfit    = cropsVisible ? ((rawSellPrice * totalUnitsRaw) - seedDeductionTotal - (fertCost * tiles)) : 0;
-  const rawPerDay    = rawProfit / seasonDays;
-
-  // PROCESADO — calidad no afecta precio procesado (máquinas usan precio base)
-  // multi-cosecha produce más unidades para procesar
-  const procBaseSell = processData.fixed > 0
-    ? processData.fixed
-    : sellPrice * processData.mult + (processData.fixed || 0);
-  const procSellPrice  = procBaseSell * (1 + artisan);
-  const lotsPerSeason  = Math.floor(seasonDays / processData.days);
-  const unitsAvailProc = harvests * plants * multiYield;
-  // batch: unidades de input por output (deshidratador=5, resto=1)
-  const outputsAvail   = Math.floor(unitsAvailProc / processData.batch);
-  const outputsProc    = Math.min(outputsAvail, lotsPerSeason * kegs);
-  const procProfit     = cropsVisible ? ((procSellPrice * outputsProc) - seedDeductionTotal - (fertCost * tiles)) : 0;
-  const procPerDay     = procProfit / seasonDays;
-
-  // ROI y mejor opción
-  const roi  = totalInvest > 0 ? (Math.max(rawProfit, procProfit) / totalInvest * 100) : 0;
-  const best = procProfit > rawProfit ? 'PROCESADO' : 'CRUDO';
-
-  // CULTIVOS — tarjeta de resultados
-  const cropCard = document.getElementById('r_crops_card');
-  if (cropCard) cropCard.style.display = cropsVisible ? 'block' : 'none';
-
-  // ANIMALES
+  // ─── ANIMALES ───────────────────────────────────────────────
   const animalsVisible = document.getElementById('animals_section').style.display !== 'none';
-  const animalProfit = animalsVisible ? calcAnimals(seasonDays) : 0;
+  const animalProfit   = animalsVisible ? calcAnimals(seasonDays) : 0;
 
-  // ÁRBOLES FRUTALES
-  const treeProfit = calcTrees();
-
-  // PESCA
+  // ─── ÁRBOLES FRUTALES / PESCA / RECOLECCIÓN / RESINERAS ───
+  const treeProfit   = calcTrees();
   const fishProfit   = calcFish();
   const forageProfit = calcForage();
   const tapperProfit = calcTapper();
 
-  // ENVÍOS: mismo precio que tienda (wiki confirmado — no hay descuento)
-  const rawProfitFinal = rawProfit;
-
-  const bestCropProfit = cropsVisible ? Math.max(rawProfitFinal, procProfit) : 0;
   const grandTotal = bestCropProfit + animalProfit + treeProfit + fishProfit + forageProfit + tapperProfit;
 
-  // Mostrar resultados
-  document.getElementById('r_harvests').textContent    = harvests;
-  document.getElementById('r_grow_real').textContent   = growReal;
-  document.getElementById('r_quality_price').textContent = fmt(rawSellPrice);
-  document.getElementById('r_raw').textContent         = fmt(rawProfitFinal);
-  document.getElementById('r_proc').textContent        = fmt(procProfit);
-  document.getElementById('r_best').textContent        = best;
-  document.getElementById('r_raw_day').textContent     = fmt(rawProfitFinal / seasonDays);
-  document.getElementById('r_proc_day').textContent    = fmt(procPerDay);
-  document.getElementById('r_roi').textContent         = roi.toFixed(1) + '%';
-  document.getElementById('r_invest').textContent      = fmt(totalInvest);
+  // ─── TARJETAS DE CULTIVOS ───────────────────────────────────
+  const cropCard    = document.getElementById('r_crops_card');
+  const investCard  = document.getElementById('r_invest_card');
+  if (cropCard)   cropCard.style.display   = cropsVisible ? 'block' : 'none';
+  if (investCard) investCard.style.display = cropsVisible ? 'block' : 'none';
+  if (cropsVisible) {
+    document.getElementById('r_crops').textContent  = fmt(bestCropProfit);
+    document.getElementById('r_invest').textContent = fmt(totalCropInvest);
+  }
 
+  // ─── TARJETAS COMBINADAS ────────────────────────────────────
   const animCard   = document.getElementById('r_animals_card');
   const treeCard   = document.getElementById('r_trees_card');
   const fishCard   = document.getElementById('r_fish_card');
@@ -562,37 +512,40 @@ function calculate() {
   const grandCard  = document.getElementById('r_grand_total_card');
 
   animCard.style.display   = (animalsVisible && animalProfit > 0) ? 'block' : 'none';
-  treeCard.style.display   = (treeProfit > 0)   ? 'block' : 'none';
-  fishCard.style.display   = (fishProfit > 0)   ? 'block' : 'none';
+  treeCard.style.display   = (treeProfit   > 0) ? 'block' : 'none';
+  fishCard.style.display   = (fishProfit   > 0) ? 'block' : 'none';
   forageCard.style.display = (forageProfit > 0) ? 'block' : 'none';
   tapperCard.style.display = (tapperProfit > 0) ? 'block' : 'none';
 
-  if (cropsVisible) {
-    document.getElementById('r_crops').textContent = fmt(bestCropProfit);
-  }
-
-  if (cropsVisible || animalProfit > 0 || treeProfit > 0 || fishProfit > 0 || forageProfit > 0 || tapperProfit > 0) {
-    grandCard.style.display = 'block';
+  const anyResult = cropsVisible || animalProfit > 0 || treeProfit > 0 || fishProfit > 0 || forageProfit > 0 || tapperProfit > 0;
+  grandCard.style.display = anyResult ? 'block' : 'none';
+  if (anyResult) {
     document.getElementById('r_animals').textContent     = fmt(animalProfit);
     document.getElementById('r_trees').textContent       = fmt(treeProfit);
     document.getElementById('r_fish').textContent        = fmt(fishProfit);
     document.getElementById('r_forage').textContent      = fmt(forageProfit);
     document.getElementById('r_tapper').textContent      = fmt(tapperProfit);
     document.getElementById('r_grand_total').textContent = fmt(grandTotal);
-  } else {
-    grandCard.style.display = 'none';
   }
 
-  const replantInfo = regrowDays === 0
-    ? `Replantación manual: ${harvests} cosechas × ${growReal}d`
-    : `Rebrote cada ${regrowDays}d: ${harvests} cosechas`;
-  const qualLabels = {none:'Sin fertilizante',basic:'Básico',deluxe:'Deluxe',luxury:'Lujo'};
+  // ─── NOTA ───────────────────────────────────────────────────
+  const qualLabels = {none:'Sin fertilizante', basic:'Básico', deluxe:'Deluxe', luxury:'Lujo'};
+  const qualFert     = document.getElementById('quality_fert').value;
+  const farmingLevel = parseInt(document.getElementById('farming_level').value) || 0;
+  const qualMult     = avgQualityMult(qualFert, farmingLevel);
+  const activeCrops  = cropsVisible
+    ? Array.from(document.querySelectorAll('.crop-qty')).filter(i => parseFloat(i.value) > 0).length
+    : 0;
 
-  document.getElementById('r_note').textContent =
-    `${replantInfo} | Calidad: ${qualLabels[qualFert]} Nv.Agric.${farmingLevel} (×${qualMult.toFixed(3)} precio) | ` +
-    `Crudo: ${fmt(rawSellPrice)}/u × ${harvests * plants} uds = ${fmt(rawProfit)} | ` +
-    `Procesado: ${fmt(procSellPrice)}/u × ${outputsProc} uds = ${fmt(procProfit)} | ` +
-    `Velocidad: ${totalSpeed > 0 ? `-${(totalSpeed*100).toFixed(0)}% (${growDays}d→${growReal}d)` : 'sin bonus'}`;
+  document.getElementById('r_note').textContent = [
+    cropsVisible ? `${activeCrops} cultivo(s) activos · Calidad: ${qualLabels[qualFert]} Nv.${farmingLevel} (×${qualMult.toFixed(3)})` : '',
+    cropsVisible ? `Cultivos: ${fmt(bestCropProfit)} ganancias · ${fmt(totalCropInvest)} inversión` : '',
+    animalProfit  > 0 ? `Animales: ${fmt(animalProfit)}`    : '',
+    treeProfit    > 0 ? `Árboles: ${fmt(treeProfit)}`       : '',
+    fishProfit    > 0 ? `Pesca: ${fmt(fishProfit)}`         : '',
+    forageProfit  > 0 ? `Recolección: ${fmt(forageProfit)}` : '',
+    tapperProfit  > 0 ? `Resineras: ${fmt(tapperProfit)}`   : '',
+  ].filter(Boolean).join(' | ');
 
   document.getElementById('results').classList.add('visible');
   document.getElementById('results').scrollIntoView({behavior:'smooth', block:'nearest'});
@@ -687,12 +640,7 @@ function toggleGreenhouseMode() {
   const active = document.getElementById('greenhouse_mode').checked;
   const info = document.getElementById('gh_info');
   info.style.display = active ? 'block' : 'none';
-  if (active) {
-    document.getElementById('season_days').value = 112;
-    document.getElementById('tiles').value = 120;
-  } else {
-    document.getElementById('season_days').value = 28;
-  }
+  document.getElementById('season_days').value = active ? 112 : 28;
 }
 
 // ─── AUXILIARES ─────────────────────────────────────────────
@@ -703,9 +651,10 @@ function toggleSection(sectionId, btnId) {
   sec.style.display = isHidden ? 'block' : 'none';
   const label = btn.textContent.includes('+') ? btn.textContent.replace('+ ','- ') : btn.textContent.replace('- ','+ ');
   btn.textContent = label;
-  if (sectionId === 'trees_section' && isHidden) loadTreeData();
+  if (sectionId === 'trees_section'   && isHidden) loadTreeData();
   if (sectionId === 'fishing_section' && isHidden) loadFishData();
+  if (sectionId === 'crops_section'   && isHidden) buildCropTable();
 }
 
-loadCrops();
+buildCropTable();
 updateProcessNote();
