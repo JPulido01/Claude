@@ -411,7 +411,7 @@ function buildCropTable() {
     tr.className = 'crop-row';
     tr.dataset.crop = name;
     tr.innerHTML = `
-      <td class="crop-name">${name}${badges.length ? ' <small style="color:var(--text-dim);font-size:13px;">(${badges.join(' · ')})</small>' : ''}</td>
+      <td class="crop-name">${name}${badges.length ? `<small style="color:var(--text-dim);font-size:13px;">(${badges.join(' · ')})</small>` : ''}</td>
       <td class="crop-buy">${crop.seed > 0 ? crop.seed + 'g' : '—'}</td>
       <td class="crop-sell">${crop.sell}g</td>
       <td class="crop-qty-cell"><input type="number" class="crop-qty" data-crop="${name}" value="0" min="0" placeholder="0"></td>
