@@ -59,6 +59,44 @@ function updateSaleOpts(id) {
   } else {
     saleSel.innerHTML = `<option value="raw">Crudo — ${prod ? prod.price : 0}g</option>`;
   }
+  updateAnimalDisplay(id);
+}
+
+function updateAnimalDisplay(id) {
+  const seasonDays     = parseFloat(document.getElementById('season_days').value) || 28;
+  const artisanMult    = document.getElementById('artisan').checked    ? 1.4  : 1.0;
+  const rancherMult    = document.getElementById('rancher').checked    ? 1.2  : 1.0;
+  const shepherdMult   = document.getElementById('shepherd').checked   ? 1.25 : 1.0;
+  const coopmasterMult = document.getElementById('coopmaster').checked ? 1.25 : 1.0;
+
+  const idx    = parseInt(document.getElementById(`animal_prod_${id}`).value) || 0;
+  const mode   = document.getElementById(`animal_sale_${id}`).value;
+  const hearts = parseFloat(document.getElementById(`animal_hearts_${id}`).value) || 1000;
+  const prod   = ANIMAL_PRODUCTS[idx];
+
+  const priceCell = document.getElementById(`animal_price_${id}`);
+  const prodsCell = document.getElementById(`animal_prods_${id}`);
+  if (!prod || !priceCell || !prodsCell) return;
+
+  const profQualMult = prod.type === 'barn' ? shepherdMult : coopmasterMult;
+  let salePrice;
+  if (mode === 'proc' && prod.processed) {
+    const am = prod.processed.artisan ? artisanMult : 1.0;
+    salePrice = prod.processed.price * prod.processed.qty * am;
+  } else {
+    salePrice = prod.price * (hearts / 1000 + 0.3) * rancherMult * profQualMult;
+  }
+
+  const productions = Math.floor(seasonDays / (prod.freq_days || 1));
+  priceCell.textContent = Math.round(salePrice) + 'g';
+  prodsCell.textContent = productions + '×';
+}
+
+function updateAllAnimalDisplays() {
+  document.querySelectorAll('.animal-row').forEach(row => {
+    const id = row.id.replace('animal_row_', '');
+    updateAnimalDisplay(id);
+  });
 }
 
 function addAnimalRow() {
@@ -67,7 +105,7 @@ function addAnimalRow() {
     const hdr = document.createElement('div');
     hdr.className = 'animal-header';
     hdr.id = 'animal_header';
-    hdr.innerHTML = '<span>Producto</span><span>Venta</span><span>Cantidad</span><span>Amistad</span><span>Prob.</span><span></span>';
+    hdr.innerHTML = '<span>Producto</span><span>Venta</span><span>Cantidad</span><span>Amistad</span><span>Prob.</span><span>Precio/u</span><span>×/Temp</span><span></span>';
     container.appendChild(hdr);
   }
   const id  = animalRowCount++;
@@ -76,9 +114,9 @@ function addAnimalRow() {
   row.id = `animal_row_${id}`;
   row.innerHTML = `
     <select id="animal_prod_${id}" onchange="updateSaleOpts(${id})">${buildProductOpts()}</select>
-    <select id="animal_sale_${id}"></select>
+    <select id="animal_sale_${id}" onchange="updateAnimalDisplay(${id})"></select>
     <input type="number" id="animal_count_${id}" value="4" min="1">
-    <select id="animal_hearts_${id}">
+    <select id="animal_hearts_${id}" onchange="updateAnimalDisplay(${id})">
       <option value="200">1♥</option>
       <option value="400">2♥</option>
       <option value="600">3♥</option>
@@ -86,6 +124,8 @@ function addAnimalRow() {
       <option value="1000" selected>5♥</option>
     </select>
     <input type="number" id="animal_prob_${id}" value="1" min="0" max="1" step="0.1" title="Probabilidad">
+    <span id="animal_price_${id}" class="animal-stat">—</span>
+    <span id="animal_prods_${id}" class="animal-stat">—</span>
     <button class="del-btn" onclick="removeAnimalRow(${id})">✕</button>
   `;
   container.appendChild(row);
@@ -698,3 +738,9 @@ updateProcessNote();
 // Actualizar cosechas cuando cambien los parámetros que las afectan
 document.getElementById('season_days').addEventListener('input',  updateCropHarvests);
 document.getElementById('agriculturist').addEventListener('change', updateCropHarvests);
+
+// Actualizar displays de animales cuando cambien profesiones o días
+document.getElementById('season_days').addEventListener('input',  updateAllAnimalDisplays);
+['rancher','artisan','shepherd','coopmaster'].forEach(cbId => {
+  document.getElementById(cbId).addEventListener('change', updateAllAnimalDisplays);
+});

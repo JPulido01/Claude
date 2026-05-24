@@ -113,7 +113,7 @@ input[type=number] { -moz-appearance: textfield; }
 ::-webkit-scrollbar { width: 8px; background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); }
 .animal-row {
-  display: grid; grid-template-columns: 1fr 1fr 110px 60px 60px 60px auto;
+  display: grid; grid-template-columns: 1fr 1fr 110px 60px 60px 70px 55px 60px auto;
   gap: 6px; align-items: center; margin-bottom: 8px;
   padding: 6px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 3px;
 }
@@ -129,9 +129,13 @@ input[type=number] { -moz-appearance: textfield; }
 }
 .animal-row .del-btn:hover { border-color: var(--accent); color: var(--accent); }
 .animal-header {
-  display: grid; grid-template-columns: 1fr 1fr 110px 60px 60px 60px auto;
+  display: grid; grid-template-columns: 1fr 1fr 110px 60px 60px 70px 55px 60px auto;
   gap: 6px; margin-bottom: 4px; padding: 0 6px;
   font-size: 13px; color: var(--text-dim);
+}
+.animal-stat {
+  text-align: center; color: var(--accent); font-size: 15px;
+  white-space: nowrap; font-family: 'VT323', monospace;
 }
 
 /* Separador secciones opcionales */
