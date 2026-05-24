@@ -17,64 +17,6 @@
 
 <div class="grid">
   <div class="section">
-    <div class="section-header"><h2>🌱 SELECCIONAR CULTIVO</h2></div>
-    <div class="section-body">
-      <div class="field">
-        <label>Cultivo</label>
-        <select id="crop" onchange="loadCropData()" style="min-width:180px;"></select>
-      </div>
-      <div id="crop_summary" class="crop-summary" style="margin-top:8px;margin-bottom:0;"></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-header"><h2>📊 PARÁMETROS</h2></div>
-    <div class="section-body">
-      <div class="field">
-        <label>Cantidad de plantas</label>
-        <input type="number" id="plants" value="100" min="1">
-      </div>
-      <div class="field">
-        <label>Espacio disponible (tiles)</label>
-        <input type="number" id="tiles" value="100" min="1">
-      </div>
-      <div class="field">
-        <label>Días de temporada</label>
-        <input type="number" id="season_days" value="28" min="1">
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="section">
-  <div class="section-header"><h2>📝 DATOS DEL CULTIVO (editables)</h2></div>
-  <div class="section-body">
-    <div class="field">
-      <label>Costo semilla (g)</label>
-      <input type="number" id="seed_cost" value="0" min="0">
-    </div>
-    <div class="field">
-      <label>Precio venta base (g)</label>
-      <input type="number" id="sell_price" value="0" min="0">
-    </div>
-    <div class="field">
-      <label>Días de crecimiento</label>
-      <input type="number" id="grow_days" value="0" min="1">
-    </div>
-    <div class="field">
-      <label>Días de rebrote (0=no rebrota)</label>
-      <input type="number" id="regrow_days" value="0" min="0">
-    </div>
-    <div class="field">
-      <label>Unidades por cosecha</label>
-      <input type="number" id="multi" value="1" min="1">
-    </div>
-    <div id="crop_note" style="font-size:13px;color:var(--text-dim);margin-top:6px;display:none;padding:4px 0;"></div>
-  </div>
-</div>
-
-<div class="grid">
-  <div class="section">
     <div class="section-header"><h2>⭐ PROFESIONES</h2></div>
     <div class="section-body">
       <div class="toggle-field">
@@ -93,9 +35,21 @@
         <label>Nivel de Agricultura (0-14)</label>
         <input type="number" id="farming_level" value="0" min="0" max="14">
       </div>
-            <div class="toggle-field">
-        <label for="rancher">Rancher (+20% productos animales)</label>
+      <div class="toggle-field">
+        <label for="rancher">Rancher (+20% productos animales crudos)</label>
         <label class="toggle"><input type="checkbox" id="rancher"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-field">
+        <label for="shepherd">Shepherd (+25% establo crudo: leche/lana/trufa)</label>
+        <label class="toggle"><input type="checkbox" id="shepherd"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-field">
+        <label for="coopmaster">Coopmaster (+25% corral crudo: huevos/lana conejo)</label>
+        <label class="toggle"><input type="checkbox" id="coopmaster"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-field">
+        <label for="gatherer">Gatherer (+20% cantidad recolectada)</label>
+        <label class="toggle"><input type="checkbox" id="gatherer"><span class="toggle-slider"></span></label>
       </div>
     </div>
   </div>
@@ -126,6 +80,81 @@
         <input type="number" id="fert_cost" value="0" min="0">
       </div>
     </div>
+  </div>
+</div>
+
+<div class="optional-divider">MÓDULOS OPCIONALES</div>
+
+<button class="btn" onclick="toggleSection('crops_section','btn_crops')" id="btn_crops" style="margin-bottom:8px;">▶ + CULTIVOS ◀</button>
+
+<div id="crops_section" style="display:none;">
+
+<div class="grid">
+  <div class="section">
+    <div class="section-header"><h2>🌱 SELECCIONAR CULTIVO</h2></div>
+    <div class="section-body">
+      <div class="field">
+        <label>Cultivo</label>
+        <select id="crop" onchange="loadCropData()" style="min-width:180px;"></select>
+      </div>
+      <div id="crop_summary" class="crop-summary" style="margin-top:8px;margin-bottom:0;"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><h2>📊 PARÁMETROS</h2></div>
+    <div class="section-body">
+      <div class="field">
+        <label>Cantidad de plantas</label>
+        <input type="number" id="plants" value="100" min="1">
+      </div>
+      <div class="field">
+        <label>Espacio disponible (tiles)</label>
+        <input type="number" id="tiles" value="100" min="1">
+      </div>
+      <div class="field">
+        <label>Días de temporada</label>
+        <input type="number" id="season_days" value="28" min="1">
+      </div>
+      <div class="toggle-field">
+        <label for="greenhouse_mode">🏡 Invernadero (112 días/año, sin límite de temporada)</label>
+        <label class="toggle"><input type="checkbox" id="greenhouse_mode" onchange="toggleGreenhouseMode()"><span class="toggle-slider"></span></label>
+      </div>
+      <div id="gh_info" style="font-size:13px;color:var(--text-dim);margin-top:4px;display:none;">
+        ✓ Días fijados en 112 · Espacio útil: 120 tiles (10×12)
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header"><h2>📝 DATOS DEL CULTIVO (editables)</h2></div>
+  <div class="section-body">
+    <div class="field">
+      <label>Costo semilla (g)</label>
+      <input type="number" id="seed_cost" value="0" min="0">
+    </div>
+    <div class="field">
+      <label>Precio venta base (g)</label>
+      <input type="number" id="sell_price" value="0" min="0">
+    </div>
+    <div class="field">
+      <label>Días de crecimiento</label>
+      <input type="number" id="grow_days" value="0" min="1">
+    </div>
+    <div class="field">
+      <label>Días de rebrote (0=no rebrota)</label>
+      <input type="number" id="regrow_days" value="0" min="0">
+    </div>
+    <div class="field">
+      <label>Unidades por cosecha</label>
+      <input type="number" id="multi" value="1" min="1">
+    </div>
+    <div class="toggle-field">
+      <label for="seeds_purchased">Semillas compradas (descuenta el costo de las ganancias)</label>
+      <label class="toggle"><input type="checkbox" id="seeds_purchased" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div id="crop_note" style="font-size:13px;color:var(--text-dim);margin-top:6px;display:none;padding:4px 0;"></div>
   </div>
 </div>
 
@@ -166,7 +195,7 @@
   </div>
 </div>
 
-<div class="optional-divider">MÓDULOS OPCIONALES</div>
+</div>
 
 <button class="btn" onclick="toggleAnimals()" id="btn_animals" style="margin-bottom:8px;">▶ + PRODUCTOS ANIMALES (OPCIONAL) ◀</button>
 
@@ -178,24 +207,6 @@
     </div>
     <div id="animal_rows"></div>
     <button class="btn" onclick="addAnimalRow()" style="font-size:8px;padding:8px;margin-top:8px;">+ AÑADIR PRODUCTO</button>
-  </div>
-</div>
-
-<button class="btn" onclick="toggleSection('greenhouse_section','btn_greenhouse')" id="btn_greenhouse" style="margin-bottom:8px;">▶ + INVERNADERO (OPCIONAL) ◀</button>
-
-<div class="section" id="greenhouse_section" style="display:none;">
-  <div class="section-header"><h2>🏡 INVERNADERO</h2></div>
-  <div class="section-body">
-    <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px;">
-      En invernadero los cultivos crecen todo el año sin límite de temporada. Los de rebrote producen indefinidamente.
-    </div>
-    <div class="toggle-field">
-      <label for="greenhouse_mode">Activar modo invernadero (temporada = año completo: 112 días)</label>
-      <label class="toggle"><input type="checkbox" id="greenhouse_mode" onchange="toggleGreenhouseMode()"><span class="toggle-slider"></span></label>
-    </div>
-    <div id="gh_info" style="font-size:13px;color:var(--text-dim);margin-top:6px;display:none;">
-      ✓ Los días de temporada se fijan en 112 (4 temporadas). Espacio útil: 120 tiles (10×12).
-    </div>
   </div>
 </div>
 
@@ -469,6 +480,8 @@
     <div id="tapper_info" style="font-size:13px;color:var(--text-dim);margin-top:6px;padding:6px;border:1px solid var(--border);background:var(--input-bg);"></div>
   </div>
 </div>
+<div class="section">
+  <div class="section-header"><h2>📦 ENVÍOS</h2></div>
   <div class="section-body">
     <div style="font-size:13px;color:var(--text-dim);margin-bottom:8px;">
       Los Envíos dan el <strong style="color:var(--text)">mismo precio</strong> que vender en tienda. La diferencia es que el dinero llega al día siguiente. No hay descuento. Artículos como armas solo se pueden vender al Gremio de Aventureros, no por envío.
@@ -534,6 +547,11 @@
       <div class="r-label">ROI (sobre inversión)</div>
       <div class="r-value" id="r_roi">—</div>
       <div class="r-unit">%</div>
+    </div>
+    <div class="result-card highlight" id="r_crops_card" style="display:none;">
+      <div class="r-label">Ganancia CULTIVOS</div>
+      <div class="r-value" id="r_crops">—</div>
+      <div class="r-unit">oro/temporada</div>
     </div>
     <div class="result-card highlight" id="r_animals_card" style="display:none;">
       <div class="r-label">Ganancia ANIMALES</div>

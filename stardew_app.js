@@ -2,26 +2,26 @@
 // saleMult: precio crudo se multiplica por (amistad/1000+0.3) × rancher
 // processed: si existe, se puede vender procesado (no afecta amistad, sí Artisan excepto aceite)
 const ANIMAL_PRODUCTS = [
-  // Corral
-  {name:"Huevo",             price:50,  freq_days:1, processed:{name:"Mayonesa",          price:190,  machine:"Mayonesera", artisan:true,  qty:1}},
-  {name:"Huevo XXL",         price:95,  freq_days:1, processed:{name:"Mayonesa Oro",       price:380,  machine:"Mayonesera", artisan:true,  qty:1}},
-  {name:"Huevo Marrón",      price:50,  freq_days:1, processed:{name:"Mayonesa",           price:190,  machine:"Mayonesera", artisan:true,  qty:1}},
-  {name:"Huevo Marrón XXL",  price:95,  freq_days:1, processed:{name:"Mayonesa Oro",       price:380,  machine:"Mayonesera", artisan:true,  qty:1}},
-  {name:"Huevo Sombrio",     price:65,  freq_days:1, processed:{name:"Mayonesa Sombría",   price:275,  machine:"Mayonesera", artisan:true,  qty:1}},
-  {name:"Huevo Dorado",      price:500, freq_days:1, processed:{name:"Mayonesa Dorada",    price:380,  machine:"Mayonesera", artisan:true,  qty:3}},
-  {name:"Huevo de Pato",     price:95,  freq_days:1, processed:{name:"Mayonesa Pato",      price:375,  machine:"Mayonesera", artisan:true,  qty:1}},
-  {name:"Pluma de Pato",     price:250, freq_days:2, processed:null},
-  {name:"Huevo Dinosaurio",  price:350, freq_days:7, processed:{name:"Mayo. Dinosaurio",   price:800,  machine:"Mayonesera", artisan:true,  qty:1}},
-  {name:"Huevo Avestruz",    price:600, freq_days:7, processed:{name:"Mayonesa ×10",       price:1900, machine:"Mayonesera", artisan:true,  qty:10}},
-  {name:"Lana (Conejo)",     price:340, freq_days:4, processed:{name:"Tela",               price:470,  machine:"Telar",      artisan:true,  qty:1}},
-  {name:"Pata de Conejo",    price:565, freq_days:4, processed:null},
-  // Establo
-  {name:"Leche",             price:125, freq_days:1, processed:{name:"Queso",              price:230,  machine:"Prensa",     artisan:true,  qty:1}},
-  {name:"Leche XXL",         price:190, freq_days:1, processed:{name:"Queso Oro",          price:345,  machine:"Prensa",     artisan:true,  qty:1}},
-  {name:"Leche de Cabra",    price:225, freq_days:2, processed:{name:"Queso Cabra",        price:400,  machine:"Prensa",     artisan:true,  qty:1}},
-  {name:"Leche Cabra XXL",   price:345, freq_days:2, processed:{name:"Queso Cabra Oro",    price:600,  machine:"Prensa",     artisan:true,  qty:1}},
-  {name:"Lana (Oveja)",      price:340, freq_days:3, processed:{name:"Tela",               price:470,  machine:"Telar",      artisan:true,  qty:1}},
-  {name:"Trufa",             price:625, freq_days:1, processed:{name:"Aceite de Trufa",    price:1065, machine:"Aceitera",   artisan:false, qty:1}},
+  // Corral (Coop) — afectados por Coopmaster
+  {name:"Huevo",             type:"coop", price:50,  freq_days:1, processed:{name:"Mayonesa",          price:190,  machine:"Mayonesera", artisan:true,  qty:1}},
+  {name:"Huevo XXL",         type:"coop", price:95,  freq_days:1, processed:{name:"Mayonesa Oro",       price:380,  machine:"Mayonesera", artisan:true,  qty:1}},
+  {name:"Huevo Marrón",      type:"coop", price:50,  freq_days:1, processed:{name:"Mayonesa",           price:190,  machine:"Mayonesera", artisan:true,  qty:1}},
+  {name:"Huevo Marrón XXL",  type:"coop", price:95,  freq_days:1, processed:{name:"Mayonesa Oro",       price:380,  machine:"Mayonesera", artisan:true,  qty:1}},
+  {name:"Huevo Sombrio",     type:"coop", price:65,  freq_days:1, processed:{name:"Mayonesa Sombría",   price:275,  machine:"Mayonesera", artisan:true,  qty:1}},
+  {name:"Huevo Dorado",      type:"coop", price:500, freq_days:1, processed:{name:"Mayonesa Dorada",    price:380,  machine:"Mayonesera", artisan:true,  qty:3}},
+  {name:"Huevo de Pato",     type:"coop", price:95,  freq_days:1, processed:{name:"Mayonesa Pato",      price:375,  machine:"Mayonesera", artisan:true,  qty:1}},
+  {name:"Pluma de Pato",     type:"coop", price:250, freq_days:2, processed:null},
+  {name:"Huevo Dinosaurio",  type:"coop", price:350, freq_days:7, processed:{name:"Mayo. Dinosaurio",   price:800,  machine:"Mayonesera", artisan:true,  qty:1}},
+  {name:"Huevo Avestruz",    type:"coop", price:600, freq_days:7, processed:{name:"Mayonesa ×10",       price:1900, machine:"Mayonesera", artisan:true,  qty:10}},
+  {name:"Lana (Conejo)",     type:"coop", price:340, freq_days:4, processed:{name:"Tela",               price:470,  machine:"Telar",      artisan:true,  qty:1}},
+  {name:"Pata de Conejo",    type:"coop", price:565, freq_days:4, processed:null},
+  // Establo (Barn) — afectados por Shepherd
+  {name:"Leche",             type:"barn", price:125, freq_days:1, processed:{name:"Queso",              price:230,  machine:"Prensa",     artisan:true,  qty:1}},
+  {name:"Leche XXL",         type:"barn", price:190, freq_days:1, processed:{name:"Queso Oro",          price:345,  machine:"Prensa",     artisan:true,  qty:1}},
+  {name:"Leche de Cabra",    type:"barn", price:225, freq_days:2, processed:{name:"Queso Cabra",        price:400,  machine:"Prensa",     artisan:true,  qty:1}},
+  {name:"Leche Cabra XXL",   type:"barn", price:345, freq_days:2, processed:{name:"Queso Cabra Oro",    price:600,  machine:"Prensa",     artisan:true,  qty:1}},
+  {name:"Lana (Oveja)",      type:"barn", price:340, freq_days:3, processed:{name:"Tela",               price:470,  machine:"Telar",      artisan:true,  qty:1}},
+  {name:"Trufa",             type:"barn", price:625, freq_days:1, processed:{name:"Aceite de Trufa",    price:1065, machine:"Aceitera",   artisan:false, qty:1}},
 ];
 
 let animalRowCount = 0;
@@ -105,8 +105,10 @@ function removeAnimalRow(id) {
 function calcAnimals(seasonDays) {
   const rows = document.querySelectorAll('.animal-row');
   if (rows.length === 0) return 0;
-  const artisanMult = document.getElementById('artisan').checked ? 1.4 : 1.0;
-  const rancherMult = document.getElementById('rancher').checked ? 1.2 : 1.0;
+  const artisanMult    = document.getElementById('artisan').checked    ? 1.4  : 1.0;
+  const rancherMult    = document.getElementById('rancher').checked    ? 1.2  : 1.0;
+  const shepherdMult   = document.getElementById('shepherd').checked   ? 1.25 : 1.0;
+  const coopmasterMult = document.getElementById('coopmaster').checked ? 1.25 : 1.0;
   let total = 0;
   rows.forEach(row => {
     const id   = row.id.replace('animal_row_', '');
@@ -118,12 +120,13 @@ function calcAnimals(seasonDays) {
     const prod   = ANIMAL_PRODUCTS[idx];
     if (!prod) return;
     const productions = seasonDays / (prod.freq_days || 1);
+    const profQualMult = prod.type === 'barn' ? shepherdMult : coopmasterMult;
     let salePrice;
     if (mode === 'proc' && prod.processed) {
       const am = prod.processed.artisan ? artisanMult : 1.0;
       salePrice = prod.processed.price * prod.processed.qty * am;
     } else {
-      salePrice = prod.price * (hearts / 1000 + 0.3) * rancherMult;
+      salePrice = prod.price * (hearts / 1000 + 0.3) * rancherMult * profQualMult;
     }
     total += salePrice * prob * count * productions;
   });
@@ -363,20 +366,21 @@ function calcForage() {
   const dehydrator = document.getElementById('forage_dehydrator').checked;
   const botanist   = document.getElementById('forage_botanist').checked;
   const artisanF   = document.getElementById('forage_artisan_f').checked;
+  // Gatherer: 20% de probabilidad de cosecha doble → ×1.2 en cantidad efectiva
+  const gathererMult = document.getElementById('gatherer').checked ? 1.2 : 1.0;
 
-  // Calidad: Botánico = siempre Iridio (×2), sino Normal (×1)
-  const qualMult = botanist ? 2.0 : 1.0;
+  const qualMult  = botanist ? 2.0 : 1.0;
   const basePrice = price * qualMult;
+  const effectivePerDay = perDay * gathererMult;
 
   if (dehydrator) {
-    // Deshidratador: 5 uds → 1 output = precio×7.5+25, 1 día
     const artisanMult = artisanF ? 1.4 : 1.0;
     const outputPrice = (price * 7.5 + 25) * artisanMult;
-    const totalUnits  = perDay * days;
+    const totalUnits  = effectivePerDay * days;
     const outputs     = Math.floor(totalUnits / 5);
     return outputPrice * outputs;
   } else {
-    return basePrice * perDay * days;
+    return basePrice * effectivePerDay * days;
   }
 }
 
@@ -450,6 +454,8 @@ function calculate() {
   const multiYield = parseFloat(document.getElementById('multi').value)      || 1;
   const kegs       = parseFloat(document.getElementById('kegs').value)       || 0;
   const fertCost   = parseFloat(document.getElementById('fert_cost').value)  || 0;
+  const cropsVisible   = document.getElementById('crops_section').style.display !== 'none';
+  const seedsPurchased = document.getElementById('seeds_purchased').checked;
 
   // noTiller: Grano de café y otros cultivos que el juego no considera verdura/fruta
   const cropName   = document.getElementById('crop').value;
@@ -487,12 +493,13 @@ function calculate() {
   const qualAdjPrice   = sellPrice * qualMult;
 
   // Inversión total
-  const totalInvest = (seedCost * plants * (1 + replants)) + (fertCost * tiles);
+  const seedDeductionTotal = seedsPurchased ? seedCost * plants * (1 + replants) : 0;
+  const totalInvest = cropsVisible ? (seedDeductionTotal + (fertCost * tiles)) : 0;
 
   // CRUDO con calidad y multi-cosecha
   const rawSellPrice = qualAdjPrice * (1 + tiller);
   const totalUnitsRaw = harvests * plants * multiYield;
-  const rawProfit    = (rawSellPrice * totalUnitsRaw) - (seedCost * plants * (1 + replants)) - (fertCost * tiles);
+  const rawProfit    = cropsVisible ? ((rawSellPrice * totalUnitsRaw) - seedDeductionTotal - (fertCost * tiles)) : 0;
   const rawPerDay    = rawProfit / seasonDays;
 
   // PROCESADO — calidad no afecta precio procesado (máquinas usan precio base)
@@ -506,12 +513,16 @@ function calculate() {
   // batch: unidades de input por output (deshidratador=5, resto=1)
   const outputsAvail   = Math.floor(unitsAvailProc / processData.batch);
   const outputsProc    = Math.min(outputsAvail, lotsPerSeason * kegs);
-  const procProfit     = (procSellPrice * outputsProc) - (seedCost * plants * (1 + replants)) - (fertCost * tiles);
+  const procProfit     = cropsVisible ? ((procSellPrice * outputsProc) - seedDeductionTotal - (fertCost * tiles)) : 0;
   const procPerDay     = procProfit / seasonDays;
 
   // ROI y mejor opción
   const roi  = totalInvest > 0 ? (Math.max(rawProfit, procProfit) / totalInvest * 100) : 0;
   const best = procProfit > rawProfit ? 'PROCESADO' : 'CRUDO';
+
+  // CULTIVOS — tarjeta de resultados
+  const cropCard = document.getElementById('r_crops_card');
+  if (cropCard) cropCard.style.display = cropsVisible ? 'block' : 'none';
 
   // ANIMALES
   const animalsVisible = document.getElementById('animals_section').style.display !== 'none';
@@ -528,7 +539,7 @@ function calculate() {
   // ENVÍOS: mismo precio que tienda (wiki confirmado — no hay descuento)
   const rawProfitFinal = rawProfit;
 
-  const bestCropProfit = Math.max(rawProfitFinal, procProfit);
+  const bestCropProfit = cropsVisible ? Math.max(rawProfitFinal, procProfit) : 0;
   const grandTotal = bestCropProfit + animalProfit + treeProfit + fishProfit + forageProfit + tapperProfit;
 
   // Mostrar resultados
@@ -556,7 +567,11 @@ function calculate() {
   forageCard.style.display = (forageProfit > 0) ? 'block' : 'none';
   tapperCard.style.display = (tapperProfit > 0) ? 'block' : 'none';
 
-  if (animalProfit > 0 || treeProfit > 0 || fishProfit > 0 || forageProfit > 0 || tapperProfit > 0) {
+  if (cropsVisible) {
+    document.getElementById('r_crops').textContent = fmt(bestCropProfit);
+  }
+
+  if (cropsVisible || animalProfit > 0 || treeProfit > 0 || fishProfit > 0 || forageProfit > 0 || tapperProfit > 0) {
     grandCard.style.display = 'block';
     document.getElementById('r_animals').textContent     = fmt(animalProfit);
     document.getElementById('r_trees').textContent       = fmt(treeProfit);
