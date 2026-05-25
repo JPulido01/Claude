@@ -165,80 +165,80 @@ function calcAnimals(seasonDays) {
 }
 
 // seed: precio semilla (Pierre salvo indicación), sell: precio venta base, grow: días, regrow: rebrote (0=no), season: temporada
-const CROPS_DB = {
+const CROPS_DB = [
   // ── PRIMAVERA ──────────────────────────────────────────────
-  "Allium azul":       {seed:30,  sell:50,  grow:7,  regrow:0, season:"🌸 Primavera"},
-  "Ajo":               {seed:40,  sell:60,  grow:4,  regrow:0, season:"🌸 Primavera"},
-  "Chirivía":          {seed:20,  sell:35,  grow:4,  regrow:0, season:"🌸 Primavera"},
-  "Coliflor":          {seed:80,  sell:175, grow:12, regrow:0, season:"🌸 Primavera"},
-  "Col Rizada":        {seed:70,  sell:110, grow:6,  regrow:0, season:"🌸 Primavera"},
-  "Fresa":             {seed:100, sell:120, grow:8,  regrow:4, season:"🌸 Primavera"},
-  "Judía Verde":       {seed:60,  sell:40,  grow:10, regrow:3, season:"🌸 Primavera"},
-  "Papa":              {seed:50,  sell:80,  grow:6,  regrow:0, season:"🌸 Primavera"},
-  "Ruibarbo":          {seed:100, sell:220, grow:13, regrow:0, season:"🌸 Primavera", seedSource:"Oasis (desierto)"},
-  "Tulipán":           {seed:20,  sell:30,  grow:6,  regrow:0, season:"🌸 Primavera"},
-  "Zanahoria":         {seed:0,   sell:35,  grow:3,  regrow:0, season:"🌸 Primavera"},
+  {name:"Allium azul",       seed:30,  sell:50,  grow:7,  regrow:0, season:"🌸 Primavera"},
+  {name:"Ajo",               seed:40,  sell:60,  grow:4,  regrow:0, season:"🌸 Primavera"},
+  {name:"Chirivía",          seed:20,  sell:35,  grow:4,  regrow:0, season:"🌸 Primavera"},
+  {name:"Coliflor",          seed:80,  sell:175, grow:12, regrow:0, season:"🌸 Primavera"},
+  {name:"Col Rizada",        seed:70,  sell:110, grow:6,  regrow:0, season:"🌸 Primavera"},
+  {name:"Fresa",             seed:100, sell:120, grow:8,  regrow:4, season:"🌸 Primavera"},
+  {name:"Judía Verde",       seed:60,  sell:40,  grow:10, regrow:3, season:"🌸 Primavera"},
+  {name:"Papa",              seed:50,  sell:80,  grow:6,  regrow:0, season:"🌸 Primavera"},
+  {name:"Ruibarbo",          seed:100, sell:220, grow:13, regrow:0, season:"🌸 Primavera", seedSource:"Oasis (desierto)"},
+  {name:"Tulipán",           seed:20,  sell:30,  grow:6,  regrow:0, season:"🌸 Primavera"},
+  {name:"Zanahoria",         seed:0,   sell:35,  grow:3,  regrow:0, season:"🌸 Primavera"},
   // ── VERANO ─────────────────────────────────────────────────
-  "Amapola":           {seed:100, sell:140, grow:7,  regrow:0, season:"☀️ Verano"},
-  "Arándano":          {seed:80,  sell:50,  grow:13, regrow:4, season:"☀️ Verano"},
-  "Carambola (Oasis)": {seed:400, sell:750, grow:13, regrow:0, season:"☀️ Verano",   seedSource:"Oasis (desierto)"},
-  "Chile Picante":     {seed:40,  sell:40,  grow:5,  regrow:3, season:"☀️ Verano"},
-  "Girasol":           {seed:200, sell:80,  grow:8,  regrow:0, season:"☀️ Verano"},
-  "Lentejuela":        {seed:50,  sell:90,  grow:8,  regrow:0, season:"☀️ Verano"},
-  "Lombarda":          {seed:100, sell:260, grow:9,  regrow:0, season:"☀️ Verano"},
-  "Lúpulo":            {seed:60,  sell:25,  grow:11, regrow:1, season:"☀️ Verano"},
-  "Maíz":              {seed:150, sell:50,  grow:14, regrow:4, season:"☀️ Verano"},
-  "Melón":             {seed:80,  sell:250, grow:12, regrow:0, season:"☀️ Verano"},
-  "Rábano":            {seed:40,  sell:90,  grow:6,  regrow:0, season:"☀️ Verano"},
-  "Tomate":            {seed:50,  sell:60,  grow:11, regrow:4, season:"☀️ Verano"},
-  "Trigo":             {seed:10,  sell:25,  grow:4,  regrow:0, season:"☀️ Verano"},
+  {name:"Amapola",           seed:100, sell:140, grow:7,  regrow:0, season:"☀️ Verano"},
+  {name:"Arándano",          seed:80,  sell:50,  grow:13, regrow:4, season:"☀️ Verano"},
+  {name:"Carambola (Oasis)", seed:400, sell:750, grow:13, regrow:0, season:"☀️ Verano",   seedSource:"Oasis (desierto)"},
+  {name:"Chile Picante",     seed:40,  sell:40,  grow:5,  regrow:3, season:"☀️ Verano"},
+  {name:"Girasol",           seed:200, sell:80,  grow:8,  regrow:0, season:"☀️ Verano"},
+  {name:"Lentejuela",        seed:50,  sell:90,  grow:8,  regrow:0, season:"☀️ Verano"},
+  {name:"Lombarda",          seed:100, sell:260, grow:9,  regrow:0, season:"☀️ Verano"},
+  {name:"Lúpulo",            seed:60,  sell:25,  grow:11, regrow:1, season:"☀️ Verano"},
+  {name:"Maíz",              seed:150, sell:50,  grow:14, regrow:4, season:"☀️ Verano"},
+  {name:"Melón",             seed:80,  sell:250, grow:12, regrow:0, season:"☀️ Verano"},
+  {name:"Rábano",            seed:40,  sell:90,  grow:6,  regrow:0, season:"☀️ Verano"},
+  {name:"Tomate",            seed:50,  sell:60,  grow:11, regrow:4, season:"☀️ Verano"},
+  {name:"Trigo",             seed:10,  sell:25,  grow:4,  regrow:0, season:"☀️ Verano"},
   // ── OTOÑO ──────────────────────────────────────────────────
-  "Alcachofa":         {seed:30,  sell:160, grow:8,  regrow:0, season:"🍂 Otoño"},
-  "Amaranto":          {seed:70,  sell:150, grow:7,  regrow:0, season:"🍂 Otoño"},
-  "Arándano Rojo":     {seed:240, sell:75,  grow:7,  regrow:5, season:"🍂 Otoño",  multi:3},
-  "Berenjena":         {seed:20,  sell:60,  grow:5,  regrow:5, season:"🍂 Otoño"},
-  "Bok Choy":          {seed:50,  sell:80,  grow:4,  regrow:0, season:"🍂 Otoño"},
-  "Calabaza":          {seed:100, sell:320, grow:13, regrow:0, season:"🍂 Otoño"},
-  "Col china":         {seed:100, sell:175, grow:12, regrow:0, season:"🍂 Otoño"},
-  "Grosella":          {seed:80,  sell:75,  grow:13, regrow:3, season:"🍂 Otoño",  multi:2},
-  "Lúpulo (Otoño)":   {seed:60,  sell:25,  grow:11, regrow:1, season:"🍂 Otoño"},
-  "Ñame":              {seed:60,  sell:160, grow:10, regrow:0, season:"🍂 Otoño"},
-  "Remolacha":         {seed:20,  sell:100, grow:6,  regrow:0, season:"🍂 Otoño"},
-  "Uva":               {seed:60,  sell:80,  grow:10, regrow:3, season:"🍂 Otoño"},
-  "Sweet Gem Berry":   {seed:1000,sell:3000,grow:24, regrow:0, season:"🍂 Otoño",    seedSource:"Carro Ambulante (precio variable 600-1000g)"},
+  {name:"Alcachofa",         seed:30,  sell:160, grow:8,  regrow:0, season:"🍂 Otoño"},
+  {name:"Amaranto",          seed:70,  sell:150, grow:7,  regrow:0, season:"🍂 Otoño"},
+  {name:"Arándano Rojo",     seed:240, sell:75,  grow:7,  regrow:5, season:"🍂 Otoño",  multi:3},
+  {name:"Berenjena",         seed:20,  sell:60,  grow:5,  regrow:5, season:"🍂 Otoño"},
+  {name:"Bok Choy",          seed:50,  sell:80,  grow:4,  regrow:0, season:"🍂 Otoño"},
+  {name:"Calabaza",          seed:100, sell:320, grow:13, regrow:0, season:"🍂 Otoño"},
+  {name:"Col china",         seed:100, sell:175, grow:12, regrow:0, season:"🍂 Otoño"},
+  {name:"Grosella",          seed:80,  sell:75,  grow:13, regrow:3, season:"🍂 Otoño",  multi:2},
+  {name:"Lúpulo (Otoño)",    seed:60,  sell:25,  grow:11, regrow:1, season:"🍂 Otoño"},
+  {name:"Ñame",              seed:60,  sell:160, grow:10, regrow:0, season:"🍂 Otoño"},
+  {name:"Remolacha",         seed:20,  sell:100, grow:6,  regrow:0, season:"🍂 Otoño"},
+  {name:"Uva",               seed:60,  sell:80,  grow:10, regrow:3, season:"🍂 Otoño"},
+  {name:"Sweet Gem Berry",   seed:1000,sell:3000,grow:24, regrow:0, season:"🍂 Otoño",    seedSource:"Carro Ambulante (precio variable 600-1000g)"},
   // ── TODO EL AÑO / INVERNADERO ──────────────────────────────
-  "Fruta Antigua":     {seed:100, sell:550, grow:28, regrow:7, season:"🏡 Invernadero", seedSource:"Carro Ambulante / donación Museo"},
+  {name:"Fruta Antigua",     seed:100, sell:550, grow:28, regrow:7, season:"🏡 Invernadero", seedSource:"Carro Ambulante / donación Museo"},
   // Grano de café: 4 granos por cosecha, rebrote cada 2 días. No se beneficia de Tiller.
   // Semilla = el propio grano (2500g en Carro Ambulante solo para la primera planta)
-  "Grano de café":     {seed:2500,sell:15,  grow:10, regrow:2, season:"🌸☀️ Primavera/Verano", multi:4, noTiller:true, seedSource:"Carro Ambulante (~2500g) / Duende del polvo (1%)"},
-};
+  {name:"Grano de café",     seed:2500,sell:15,  grow:10, regrow:2, season:"🌸☀️ Primavera/Verano", multi:4, noTiller:true, seedSource:"Carro Ambulante (~2500g) / Duende del polvo (1%)"},
+];
 
 // mult: multiplicador sobre precio base del cultivo
 // fixed: precio fijo (ignora precio base del cultivo, ej: cerveza siempre 200g)
 // days: días de procesamiento
 // batch: unidades de input por batch (deshidratador requiere 5)
 // note: descripción para mostrar al usuario
-const PROCESS_DATA = {
-  keg_wine:       { mult:3,    fixed:0,   days:7,    batch:1, note:"Tonel · Vino · ×3 precio fruta · 7 días por batch" },
-  keg_juice:      { mult:2.25, fixed:0,   days:4,    batch:1, note:"Tonel · Jugo · ×2.25 precio vegetal · 4 días por batch" },
-  keg_mead:       { mult:0,    fixed:300, days:0.42, batch:1, note:"Tonel · Hidromiel · 300g fijo (entrada: Miel) · 10 horas por batch" },
-  keg_pale_ale:   { mult:0,    fixed:300, days:1.56, batch:1, note:"Tonel · Cerveza Pálida · 300g fijo (entrada: Lúpulo) · ~1.5 días por batch" },
-  keg_beer:       { mult:0,    fixed:200, days:1,    batch:1, note:"Tonel · Cerveza · 200g fijo (entrada: Trigo) · 1 día por batch" },
-  cask_wine:      { mult:3,    fixed:0,   days:7,    batch:1, note:"Barril · Vino/Mermelada · ×3 precio fruta · 7 días (calidad base)" },
-  cask_juice:     { mult:2.25, fixed:0,   days:4,    batch:1, note:"Barril · Zumo/Encurtido · ×2.25 precio vegetal · 4 días (calidad base)" },
-  jar_jam:        { mult:2,    fixed:50,  days:2.5,  batch:1, note:"Envasadora · Mermelada · ×2+50g precio fruta · 2-3 días por batch" },
-  jar_pickle:     { mult:2,    fixed:50,  days:2.5,  batch:1, note:"Envasadora · Encurtido · ×2+50g precio vegetal · 2-3 días por batch" },
-  dryer_fruit:    { mult:7.5,  fixed:25,  days:1,    batch:5, note:"Deshidratador · Fruta seca · ×7.5+25g · 1 día · requiere 5 unidades por batch" },
-  dryer_mushroom: { mult:7.5,  fixed:25,  days:1,    batch:5, note:"Deshidratador · Setas secas · ×7.5+25g · 1 día · requiere 5 unidades por batch" },
-  smoker:         { mult:2,    fixed:0,   days:0.035,batch:1, note:"Ahumador · Pescado ahumado · ×2 precio pescado · 50 minutos por batch" },
-  loom:           { mult:0,    fixed:470, days:0.17, batch:1, note:"Telar · Tela · 470g fijo (entrada: Lana) · 4 horas por batch" },
-};
+const PROCESS_DATA = [
+  {name:"keg_wine",       mult:3,    fixed:0,   days:7,    batch:1, note:"Tonel · Vino · ×3 precio fruta · 7 días por batch"},
+  {name:"keg_juice",      mult:2.25, fixed:0,   days:4,    batch:1, note:"Tonel · Jugo · ×2.25 precio vegetal · 4 días por batch"},
+  {name:"keg_mead",       mult:0,    fixed:300, days:0.42, batch:1, note:"Tonel · Hidromiel · 300g fijo (entrada: Miel) · 10 horas por batch"},
+  {name:"keg_pale_ale",   mult:0,    fixed:300, days:1.56, batch:1, note:"Tonel · Cerveza Pálida · 300g fijo (entrada: Lúpulo) · ~1.5 días por batch"},
+  {name:"keg_beer",       mult:0,    fixed:200, days:1,    batch:1, note:"Tonel · Cerveza · 200g fijo (entrada: Trigo) · 1 día por batch"},
+  {name:"cask_wine",      mult:3,    fixed:0,   days:7,    batch:1, note:"Barril · Vino/Mermelada · ×3 precio fruta · 7 días (calidad base)"},
+  {name:"cask_juice",     mult:2.25, fixed:0,   days:4,    batch:1, note:"Barril · Zumo/Encurtido · ×2.25 precio vegetal · 4 días (calidad base)"},
+  {name:"jar_jam",        mult:2,    fixed:50,  days:2.5,  batch:1, note:"Envasadora · Mermelada · ×2+50g precio fruta · 2-3 días por batch"},
+  {name:"jar_pickle",     mult:2,    fixed:50,  days:2.5,  batch:1, note:"Envasadora · Encurtido · ×2+50g precio vegetal · 2-3 días por batch"},
+  {name:"dryer_fruit",    mult:7.5,  fixed:25,  days:1,    batch:5, note:"Deshidratador · Fruta seca · ×7.5+25g · 1 día · requiere 5 unidades por batch"},
+  {name:"dryer_mushroom", mult:7.5,  fixed:25,  days:1,    batch:5, note:"Deshidratador · Setas secas · ×7.5+25g · 1 día · requiere 5 unidades por batch"},
+  {name:"smoker",         mult:2,    fixed:0,   days:0.035,batch:1, note:"Ahumador · Pescado ahumado · ×2 precio pescado · 50 minutos por batch"},
+  {name:"loom",           mult:0,    fixed:470, days:0.17, batch:1, note:"Telar · Tela · 470g fijo (entrada: Lana) · 4 horas por batch"},
+];
 
 function updateProcessNote() {
   const typeEl = document.getElementById('process_type');
   const noteEl = document.getElementById('process_note');
   if (!typeEl || !noteEl) return;
-  const data = PROCESS_DATA[typeEl.value];
+  const data = PROCESS_DATA.find(p => p.name === typeEl.value);
   if (data) noteEl.textContent = data.note;
 }
 
@@ -336,34 +336,34 @@ function updateFertCost() {
 }
 
 // ─── RECOLECCIÓN ────────────────────────────────────────────
-const FORAGE_DB = {
+const FORAGE_DB = [
   // Primavera
-  rabano_silv:50, narciso:80, puerro:60, diente_leon:40,
-  cebolleta:80, colmenilla:150, seta_comun_p:40, frambuesa:50,
+  {name:"rabano_silv", sell:50},  {name:"narciso",      sell:80},  {name:"puerro",       sell:60},  {name:"diente_leon",  sell:40},
+  {name:"cebolleta",   sell:80},  {name:"colmenilla",   sell:150}, {name:"seta_comun_p", sell:40},  {name:"frambuesa",    sell:50},
   // Verano
-  uva:80, baya_esp:80, guisante_dulce:50, seta_roja:75, helecho:90,
+  {name:"uva",         sell:80},  {name:"baya_esp",     sell:80},  {name:"guisante_dulce",sell:50}, {name:"seta_roja",    sell:75},  {name:"helecho", sell:90},
   // Otoño
-  seta_comun_o:40, ciruela_salv:80, avellana:90, mora:75,
-  chantarela:160, seta_lila:320,
+  {name:"seta_comun_o",sell:40},  {name:"ciruela_salv", sell:80},  {name:"avellana",     sell:90},  {name:"mora",         sell:75},
+  {name:"chantarela",  sell:160}, {name:"seta_lila",    sell:320},
   // Invierno
-  raiz_invernal:70, fruta_cristal:150, name_nival:100, azafran:60, acebo:80,
+  {name:"raiz_invernal",sell:70}, {name:"fruta_cristal",sell:150}, {name:"name_nival",   sell:100}, {name:"azafran",      sell:60},  {name:"acebo", sell:80},
   // Isla
-  jengibre:60, coco:100, piña:100,
-};
+  {name:"jengibre",    sell:60},  {name:"coco",         sell:100}, {name:"piña",         sell:100},
+];
 
 // ─── RESINERAS ──────────────────────────────────────────────
 // days: días normales | daysHeavy: días con Grifo pesado
-const TAPPER_DB = {
-  maple:    { price:200,  days:9,   daysHeavy:4.5, note:"Jarabe de Arce · Arce · 9 días (4-5 con Grifo)" },
-  oak:      { price:150,  days:7.5, daysHeavy:3.5, note:"Resina de Roble · Roble · 7-8 días (3-4 con Grifo)" },
-  pine:     { price:100,  days:5.5, daysHeavy:2.5, note:"Brea de Pino · Pino · 5-6 días (2-3 con Grifo)" },
-  mahogany: { price:15,   days:1,   daysHeavy:1,   note:"Savia · Caoba · 1 día (igual con Grifo)" },
-  mystic:   { price:1000, days:7,   daysHeavy:3.5, note:"Sirope Místico · Árbol Místico · 7 días (3-4 con Grifo)" },
-};
+const TAPPER_DB = [
+  {name:"maple",    price:200,  days:9,   daysHeavy:4.5, note:"Jarabe de Arce · Arce · 9 días (4-5 con Grifo)"},
+  {name:"oak",      price:150,  days:7.5, daysHeavy:3.5, note:"Resina de Roble · Roble · 7-8 días (3-4 con Grifo)"},
+  {name:"pine",     price:100,  days:5.5, daysHeavy:2.5, note:"Brea de Pino · Pino · 5-6 días (2-3 con Grifo)"},
+  {name:"mahogany", price:15,   days:1,   daysHeavy:1,   note:"Savia · Caoba · 1 día (igual con Grifo)"},
+  {name:"mystic",   price:1000, days:7,   daysHeavy:3.5, note:"Sirope Místico · Árbol Místico · 7 días (3-4 con Grifo)"},
+];
 
 function loadTapperData() {
   const type = document.getElementById('tapper_type').value;
-  const data = TAPPER_DB[type];
+  const data = TAPPER_DB.find(t => t.name === type);
   const heavy = document.getElementById('tapper_heavy').checked;
   const el = document.getElementById('tapper_info');
   if (data && el) el.textContent = data.note;
@@ -377,7 +377,7 @@ function calcTapper() {
   const days    = parseFloat(document.getElementById('tapper_days').value)    || 0;
   const heavy   = document.getElementById('tapper_heavy').checked;
   const tapperP = document.getElementById('tapper_tapper_prof').checked ? 1.25 : 1.0;
-  const data    = TAPPER_DB[type];
+  const data    = TAPPER_DB.find(t => t.name === type);
   if (!data) return 0;
   const cycleDays  = heavy ? data.daysHeavy : data.days;
   const outputs    = Math.floor(days / cycleDays);
@@ -387,7 +387,7 @@ function calcTapper() {
 
 function loadForageData() {
   const type = document.getElementById('forage_type').value;
-  document.getElementById('forage_price').value = FORAGE_DB[type] || 0;
+  document.getElementById('forage_price').value = (FORAGE_DB.find(f => f.name === type)?.sell) || 0;
 }
 
 function calcForage() {
@@ -423,8 +423,7 @@ function buildCropTable() {
   if (!tbody) return;
   tbody.innerHTML = '';
   let lastSeason = '';
-  for (const name in CROPS_DB) {
-    const crop = CROPS_DB[name];
+  for (const crop of CROPS_DB) {
     // Cabecera de temporada
     if (crop.season !== lastSeason) {
       lastSeason = crop.season;
@@ -441,13 +440,13 @@ function buildCropTable() {
 
     const tr = document.createElement('tr');
     tr.className = 'crop-row';
-    tr.dataset.crop = name;
+    tr.dataset.crop = crop.name;
     tr.innerHTML = `
-      <td class="crop-name">${name}${badges.length ? `<small style="color:var(--text-dim);font-size:13px;">(${badges.join(' · ')})</small>` : ''}</td>
+      <td class="crop-name">${crop.name}${badges.length ? `<small style="color:var(--text-dim);font-size:13px;">(${badges.join(' · ')})</small>` : ''}</td>
       <td class="crop-buy">${crop.seed > 0 ? crop.seed + 'g' : '—'}</td>
       <td class="crop-sell">${crop.sell}g</td>
-      <td class="crop-harvests" data-crop="${name}">—</td>
-      <td class="crop-qty-cell"><input type="number" class="crop-qty" data-crop="${name}" value="0" min="0" placeholder="0"></td>
+      <td class="crop-harvests" data-crop="${crop.name}">—</td>
+      <td class="crop-qty-cell"><input type="number" class="crop-qty" data-crop="${crop.name}" value="0" min="0" placeholder="0"></td>
     `;
     tbody.appendChild(tr);
   }
@@ -462,7 +461,7 @@ function updateCropHarvests() {
 
   document.querySelectorAll('.crop-harvests').forEach(cell => {
     const name = cell.dataset.crop;
-    const crop = CROPS_DB[name];
+    const crop = CROPS_DB.find(c => c.name === name);
     if (!crop) return;
 
     const growReal = Math.max(1, Math.ceil(crop.grow * (1 - totalSpeed)));
@@ -503,7 +502,7 @@ function calcCrops(seasonDays) {
     if (qty <= 0) return;
 
     const name = input.dataset.crop;
-    const crop = CROPS_DB[name];
+    const crop = CROPS_DB.find(c => c.name === name);
     if (!crop) return;
 
     const noTiller = crop.noTiller || false;
@@ -615,22 +614,22 @@ function calculate() {
 // Precios por año (calidad sube 1★ por año del árbol)
 // año1=Normal, año2=Plata(×1.25), año3=Oro(×1.5), año4+=Iridio(×2)
 // sell = precio Normal. La calidad se aplica con TREE_QUALITY_MULT
-const TREES_DB = {
-  apricot:     { sell:50,  sapling:2000, season:'🌸 Primavera', days:28 },
-  cherry:      { sell:80,  sapling:3400, season:'🌸 Primavera', days:28 },
-  orange:      { sell:100, sapling:4000, season:'☀️ Verano',    days:28 },
-  peach:       { sell:140, sapling:6000, season:'☀️ Verano',    days:28 },
-  apple:       { sell:100, sapling:4000, season:'🍂 Otoño',     days:28 },
-  pomegranate: { sell:140, sapling:6000, season:'🍂 Otoño',     days:28 },
-  banana:      { sell:150, sapling:0,    season:'🏝️ Isla/Invernadero', days:28 },
-  mango:       { sell:130, sapling:0,    season:'🏝️ Isla/Invernadero', days:28 },
-};
+const TREES_DB = [
+  {name:"apricot",     sell:50,  sapling:2000, season:'🌸 Primavera',          days:28},
+  {name:"cherry",      sell:80,  sapling:3400, season:'🌸 Primavera',          days:28},
+  {name:"orange",      sell:100, sapling:4000, season:'☀️ Verano',             days:28},
+  {name:"peach",       sell:140, sapling:6000, season:'☀️ Verano',             days:28},
+  {name:"apple",       sell:100, sapling:4000, season:'🍂 Otoño',              days:28},
+  {name:"pomegranate", sell:140, sapling:6000, season:'🍂 Otoño',              days:28},
+  {name:"banana",      sell:150, sapling:0,    season:'🏝️ Isla/Invernadero',   days:28},
+  {name:"mango",       sell:130, sapling:0,    season:'🏝️ Isla/Invernadero',   days:28},
+];
 // Calidad por año: año1=Normal, año2=Plata, año3=Oro, año4+=Iridio
 const TREE_QUALITY_MULT = [1.0, 1.25, 1.5, 2.0];
 
 function loadTreeData() {
   const type = document.getElementById('tree_type').value;
-  const tree = TREES_DB[type];
+  const tree = TREES_DB.find(t => t.name === type);
   const inGH  = document.getElementById('tree_greenhouse').value === '1';
   const days  = inGH ? 112 : 28;
   const info  = document.getElementById('tree_info');
@@ -646,7 +645,7 @@ function calcTrees() {
   const inGH   = document.getElementById('tree_greenhouse').value === '1';
   const artisan= document.getElementById('artisan').checked ? 0.40 : 0;
   const tiller = document.getElementById('tiller').checked  ? 0.10 : 0;
-  const tree   = TREES_DB[type];
+  const tree   = TREES_DB.find(t => t.name === type);
   const qualM  = TREE_QUALITY_MULT[year - 1];
   const days   = inGH ? 112 : 28;
   const sellRaw = tree.sell * qualM * (1 + tiller);
@@ -655,31 +654,38 @@ function calcTrees() {
 
 // ─── PESCA ──────────────────────────────────────────────────
 // Precios base exactos de la wiki (precio normal sin profesión)
-const FISH_DB = {
+const FISH_DB = [
   // Primavera
-  anchoa:30, lubina:100, pez_gato:200, pez_sol:30, arenque:30,
-  anguila:85, sardina:40, sabalo:60, platija:100, fletan:80, leyenda:5000,
+  {name:"anchoa",          sell:30},   {name:"lubina",         sell:100},  {name:"pez_gato",       sell:200},
+  {name:"pez_sol",         sell:30},   {name:"arenque",        sell:30},   {name:"anguila",        sell:85},
+  {name:"sardina",         sell:40},   {name:"sabalo",         sell:60},   {name:"platija",        sell:100},
+  {name:"fletan",          sell:80},   {name:"leyenda",        sell:5000},
   // Verano
-  pez_globo:200, atun:100, trucha_arcoiris:65, pez_gato_v:200, sauri:1000,
-  pulpo:150, pargo:50, superpepino:250, esturion:200, tilapia:75,
-  dorado:100, salmonete:30, pez_carmesi:1500,
+  {name:"pez_globo",       sell:200},  {name:"atun",           sell:100},  {name:"trucha_arcoiris",sell:65},
+  {name:"pez_gato_v",      sell:200},  {name:"sauri",          sell:1000}, {name:"pulpo",          sell:150},
+  {name:"pargo",           sell:50},   {name:"superpepino",    sell:250},  {name:"esturion",       sell:200},
+  {name:"tilapia",         sell:75},   {name:"dorado",         sell:100},  {name:"salmonete",      sell:30},
+  {name:"pez_carmesi",     sell:1500},
   // Otoño
-  perca_peq:50, perca:100, salmon:75, tiger_trout:150, albacore:75,
-  pez_madera:75, carpa:30, lucio:100, void_salmon:150, rape:900, linterna:120,
+  {name:"perca_peq",       sell:50},   {name:"perca",          sell:100},  {name:"salmon",         sell:75},
+  {name:"tiger_trout",     sell:150},  {name:"albacore",       sell:75},   {name:"pez_madera",     sell:75},
+  {name:"carpa",           sell:30},   {name:"lucio",          sell:100},  {name:"void_salmon",    sell:150},
+  {name:"rape",            sell:900},  {name:"linterna",       sell:120},
   // Invierno
-  atun_inv:100, sardina_inv:40, lucio_inv:100, pez_hielo:500, calamar:80,
-  pepino_mar:75, superpepino_i:250, pez_piedra:500, pez_fantasma_i:45,
-  pez_glaciar:1000, anguila_lava_i:700, carpa_mutante:1000,
+  {name:"atun_inv",        sell:100},  {name:"sardina_inv",    sell:40},   {name:"lucio_inv",      sell:100},
+  {name:"pez_hielo",       sell:500},  {name:"calamar",        sell:80},   {name:"pepino_mar",     sell:75},
+  {name:"superpepino_i",   sell:250},  {name:"pez_piedra",     sell:500},  {name:"pez_fantasma_i", sell:45},
+  {name:"pez_glaciar",     sell:1000}, {name:"anguila_lava_i", sell:700},  {name:"carpa_mutante",  sell:1000},
   // Todo el año
-  carpa_all:30, perca_peq_all:50, pez_madera_all:75, perca_all:100,
-  lucio_all:100, void_salmon_all:150, pez_fantasma_all:45,
-  pez_piedra_all:500, pez_hielo_all:500, anguila_lava_all:700,
-  carpa_mutante_all:1000,
-};
+  {name:"carpa_all",       sell:30},   {name:"perca_peq_all",  sell:50},   {name:"pez_madera_all", sell:75},
+  {name:"perca_all",       sell:100},  {name:"lucio_all",      sell:100},  {name:"void_salmon_all",sell:150},
+  {name:"pez_fantasma_all",sell:45},   {name:"pez_piedra_all", sell:500},  {name:"pez_hielo_all",  sell:500},
+  {name:"anguila_lava_all",sell:700},  {name:"carpa_mutante_all",sell:1000},
+];
 
 function loadFishData() {
   const type = document.getElementById('fish_type').value;
-  document.getElementById('fish_price').value = FISH_DB[type] || 0;
+  document.getElementById('fish_price').value = (FISH_DB.find(f => f.name === type)?.sell) || 0;
 }
 
 function calcFish() {
