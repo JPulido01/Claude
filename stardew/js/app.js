@@ -71,7 +71,7 @@ function updateAnimalDisplay(id) {
 
   const idx    = parseInt(document.getElementById(`animal_prod_${id}`).value) || 0;
   const mode   = document.getElementById(`animal_sale_${id}`).value;
-  const hearts = parseFloat(document.getElementById(`animal_hearts_${id}`).value) || 1000;
+
   const prod   = ANIMAL_PRODUCTS[idx];
 
   const priceCell = document.getElementById(`animal_price_${id}`);
@@ -84,7 +84,7 @@ function updateAnimalDisplay(id) {
     const am = prod.processed.artisan ? artisanMult : 1.0;
     salePrice = prod.processed.price * prod.processed.qty * am;
   } else {
-    salePrice = prod.price * (hearts / 1000 + 0.3) * rancherMult * profQualMult;
+    salePrice = prod.price * rancherMult * profQualMult;
   }
 
   const productions = Math.floor(seasonDays / (prod.freq_days || 1));
@@ -105,7 +105,7 @@ function addAnimalRow() {
     const hdr = document.createElement('div');
     hdr.className = 'animal-header';
     hdr.id = 'animal_header';
-    hdr.innerHTML = '<span>Producto</span><span>Venta</span><span>Cantidad</span><span>Amistad</span><span>Prob.</span><span>Precio/u</span><span>×/Temp</span><span></span>';
+    hdr.innerHTML = '<span>Producto</span><span>Venta</span><span>Diario</span><span>Precio/u</span><span>×/Temp</span><span></span>';
     container.appendChild(hdr);
   }
   const id  = animalRowCount++;
@@ -116,14 +116,6 @@ function addAnimalRow() {
     <select id="animal_prod_${id}" onchange="updateSaleOpts(${id})">${buildProductOpts()}</select>
     <select id="animal_sale_${id}" onchange="updateAnimalDisplay(${id})"></select>
     <input type="number" id="animal_count_${id}" value="4" min="1">
-    <select id="animal_hearts_${id}" onchange="updateAnimalDisplay(${id})">
-      <option value="200">1♥</option>
-      <option value="400">2♥</option>
-      <option value="600">3♥</option>
-      <option value="800">4♥</option>
-      <option value="1000" selected>5♥</option>
-    </select>
-    <input type="number" id="animal_prob_${id}" value="1" min="0" max="1" step="0.1" title="Probabilidad">
     <span id="animal_price_${id}" class="animal-stat">—</span>
     <span id="animal_prods_${id}" class="animal-stat">—</span>
     <button class="del-btn" onclick="removeAnimalRow(${id})">✕</button>
@@ -154,9 +146,8 @@ function calcAnimals(seasonDays) {
     const id   = row.id.replace('animal_row_', '');
     const idx  = parseInt(document.getElementById(`animal_prod_${id}`).value) || 0;
     const mode = document.getElementById(`animal_sale_${id}`).value;
-    const count  = parseFloat(document.getElementById(`animal_count_${id}`).value)  || 0;
-    const hearts = parseFloat(document.getElementById(`animal_hearts_${id}`).value) || 1000;
-    const prob   = parseFloat(document.getElementById(`animal_prob_${id}`).value)   || 1;
+    const count  = parseFloat(document.getElementById(`animal_count_${id}`).value) || 0;
+  
     const prod   = ANIMAL_PRODUCTS[idx];
     if (!prod) return;
     const productions = seasonDays / (prod.freq_days || 1);
@@ -166,9 +157,9 @@ function calcAnimals(seasonDays) {
       const am = prod.processed.artisan ? artisanMult : 1.0;
       salePrice = prod.processed.price * prod.processed.qty * am;
     } else {
-      salePrice = prod.price * (hearts / 1000 + 0.3) * rancherMult * profQualMult;
+      salePrice = prod.price * rancherMult * profQualMult;
     }
-    total += salePrice * prob * count * productions;
+    total += salePrice * count * productions;
   });
   return total;
 }
@@ -500,10 +491,8 @@ function calcCrops(seasonDays) {
   const tillerRaw    = document.getElementById('tiller').checked        ? 0.10 : 0;
   const agriculturist= document.getElementById('agriculturist').checked ? 0.10 : 0;
   const speedBonus   = parseFloat(document.getElementById('fertilizer').value) || 0;
-  const qualFert     = document.getElementById('quality_fert').value;
-  const farmingLevel = parseInt(document.getElementById('farming_level').value) || 0;
-  const qualMult     = avgQualityMult(qualFert, farmingLevel);
-  const fertCost     = parseFloat(document.getElementById('fert_cost').value) || 0;
+  const qualMult  = 1.0;
+  const fertCost  = parseFloat(document.getElementById('fert_cost').value) || 0;
   const totalSpeed   = agriculturist + speedBonus;
 
   let totalProfit = 0;
@@ -604,16 +593,12 @@ function calculate() {
   }
 
   // ─── NOTA ───────────────────────────────────────────────────
-  const qualLabels = {none:'Sin fertilizante', basic:'Básico', deluxe:'Deluxe', luxury:'Lujo'};
-  const qualFert     = document.getElementById('quality_fert').value;
-  const farmingLevel = parseInt(document.getElementById('farming_level').value) || 0;
-  const qualMult     = avgQualityMult(qualFert, farmingLevel);
   const activeCrops  = cropsVisible
     ? Array.from(document.querySelectorAll('.crop-qty')).filter(i => parseFloat(i.value) > 0).length
     : 0;
 
   document.getElementById('r_note').textContent = [
-    cropsVisible ? `${activeCrops} cultivo(s) activos · Calidad: ${qualLabels[qualFert]} Nv.${farmingLevel} (×${qualMult.toFixed(3)})` : '',
+    cropsVisible ? `${activeCrops} cultivo(s) activos · Precio: calidad Normal (×1.000)` : '',
     cropsVisible ? `Cultivos: ${fmt(bestCropProfit)} ganancias · ${fmt(totalCropInvest)} inversión` : '',
     animalProfit  > 0 ? `Animales: ${fmt(animalProfit)}`    : '',
     treeProfit    > 0 ? `Árboles: ${fmt(treeProfit)}`       : '',

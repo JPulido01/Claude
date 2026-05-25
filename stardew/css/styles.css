@@ -1,11 +1,12 @@
 :root {
-  --bg: #111318; --surface: #1c1f26; --surface2: #252830;
-  --border: #3a3f4a; --border-light: #c0392b; --accent: #e74c3c; --accent2: #c0392b;
-  --text: #ecf0f1; --text-dim: #95a5a6; --input-bg: #0d0f13; --pixel: 1px;
+  --bg: #0c0a08; --surface: #181210; --surface2: #201814;
+  --border: #3a2c1e; --border-light: #5a4230; --accent: #d4943a; --accent2: #b87830;
+  --text: #e8dcc8; --text-dim: #907860; --input-bg: #0a0806; --pixel: 1px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  background: var(--bg); color: var(--text); font-family: 'VT323', monospace; font-size: 18px;
+  background: var(--bg) url('../img/bg.jpg') center / cover fixed;
+  color: var(--text); font-family: 'VT323', monospace; font-size: 18px;
   min-height: 100vh; padding: 20px;
 }
 .container { max-width: 900px; margin: 0 auto; }
@@ -23,7 +24,7 @@ header p { color: var(--text-dim); font-size: 16px; }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
 @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
 .section {
-  background: var(--surface); padding: 0; border: 1px solid var(--border);
+  background: rgba(18, 14, 10, 0.88); padding: 0; border: 1px solid var(--border);
   border-radius: 4px; margin-bottom: 12px;
 }
 .section-header {
@@ -79,7 +80,7 @@ input[type=number] { -moz-appearance: textfield; }
 }
 .btn:hover { background: var(--accent); }
 .btn:active { opacity: 0.8; }
-.results { background: var(--surface); border: 1px solid var(--accent);
+.results { background: rgba(18, 14, 10, 0.88); border: 1px solid var(--accent);
   border-radius: 4px; margin-top: 12px; display: none;
 }
 .results.visible { display: block; animation: fadeIn 0.2s ease; }
@@ -113,7 +114,7 @@ input[type=number] { -moz-appearance: textfield; }
 ::-webkit-scrollbar { width: 8px; background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); }
 .animal-row {
-  display: grid; grid-template-columns: 1fr 1fr 110px 60px 60px 70px 55px 60px auto;
+  display: grid; grid-template-columns: 1fr 1fr 110px 70px 55px auto;
   gap: 6px; align-items: center; margin-bottom: 8px;
   padding: 6px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 3px;
 }
@@ -129,7 +130,7 @@ input[type=number] { -moz-appearance: textfield; }
 }
 .animal-row .del-btn:hover { border-color: var(--accent); color: var(--accent); }
 .animal-header {
-  display: grid; grid-template-columns: 1fr 1fr 110px 60px 60px 70px 55px 60px auto;
+  display: grid; grid-template-columns: 1fr 1fr 110px 70px 55px auto;
   gap: 6px; margin-bottom: 4px; padding: 0 6px;
   font-size: 13px; color: var(--text-dim);
 }
